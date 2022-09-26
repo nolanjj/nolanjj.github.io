@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Biomart对基因进行注释</title>
+    <url>/2022/09/25/Biomart%E5%AF%B9%E5%9F%BA%E5%9B%A0%E8%BF%9B%E8%A1%8C%E6%B3%A8%E9%87%8A/</url>
+    <content><![CDATA[<h3 id="对植物"><a href="#对植物" class="headerlink" title="对植物"></a>对植物</h3><p>mart要指定为plants_mart</p>
+<p>dataset指定物种数据库的名称</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">ensembl <span class="operator">=</span> useMart<span class="punctuation">(</span>biomart <span class="operator">=</span> <span class="string">&quot;plants_mart&quot;</span><span class="punctuation">,</span>host <span class="operator">=</span> <span class="string">&quot;http://plants.ensembl.org&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 列出可选择的植物</span></span><br><span class="line">listDatasets<span class="punctuation">(</span>ensembl<span class="punctuation">)</span>  </span><br><span class="line"></span><br><span class="line">ensembl <span class="operator">=</span> useMart<span class="punctuation">(</span>biomart <span class="operator">=</span> <span class="string">&quot;plants_mart&quot;</span><span class="punctuation">,</span>host <span class="operator">=</span> <span class="string">&quot;http://plants.ensembl.org&quot;</span><span class="punctuation">,</span>dataset<span class="operator">=</span><span class="string">&quot;sitalica_eg_gene&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">gene <span class="operator">&lt;-</span> read.table<span class="punctuation">(</span><span class="string">&quot;./128个基因.txt&quot;</span><span class="punctuation">)</span></span><br><span class="line">gene <span class="operator">&lt;-</span> gene<span class="operator">$</span>V1</span><br><span class="line"></span><br><span class="line">listAttributes<span class="punctuation">(</span>ensembl<span class="punctuation">)</span> <span class="operator">%&gt;%</span> View<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">gene_anno <span class="operator">&lt;-</span> getBM<span class="punctuation">(</span><span class="built_in">attributes</span><span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="string">&quot;ensembl_gene_id&quot;</span><span class="punctuation">,</span> <span class="string">&quot;gene_biotype&quot;</span><span class="punctuation">,</span></span><br><span class="line">                                 <span class="string">&quot;chromosome_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;start_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;end_position&quot;</span><span class="punctuation">,</span></span><br><span class="line">                                 <span class="string">&quot;strand&quot;</span><span class="punctuation">,</span><span class="string">&quot;description&quot;</span><span class="punctuation">,</span><span class="string">&quot;ensembl_peptide_id&quot;</span><span class="punctuation">,</span><span class="string">&quot;peptide&quot;</span><span class="punctuation">)</span><span class="punctuation">,</span> </span><br><span class="line">                    filters<span class="operator">=</span> <span class="string">&#x27;ensembl_gene_id&#x27;</span><span class="punctuation">,</span> value <span class="operator">=</span>gene<span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p><code>listAttributes(ensembl) %&gt;% View()</code></p>
+<p>列出可以添加的信息</p>
+<p><img src="/2022/09/25/Biomart%E5%AF%B9%E5%9F%BA%E5%9B%A0%E8%BF%9B%E8%A1%8C%E6%B3%A8%E9%87%8A/image-20220925204715975.png" alt="image-20220925204715975"></p>
+<h3 id="对动物"><a href="#对动物" class="headerlink" title="对动物"></a>对动物</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">listEnsembl<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">ensembl <span class="operator">&lt;-</span> useEnsembl<span class="punctuation">(</span>biomart <span class="operator">=</span> <span class="string">&quot;genes&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">listDatasets<span class="punctuation">(</span>ensembl<span class="punctuation">)</span></span><br><span class="line">ensembl <span class="operator">&lt;-</span> useDataset<span class="punctuation">(</span>dataset <span class="operator">=</span> <span class="string">&quot;mmusculus_gene_ensembl&quot;</span><span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">listAttributes<span class="punctuation">(</span>ensembl<span class="punctuation">)</span> <span class="operator">%&gt;%</span> View<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">martsymbol <span class="operator">&lt;-</span> getBM<span class="punctuation">(</span><span class="built_in">attributes</span><span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="string">&quot;ensembl_gene_id&quot;</span><span class="punctuation">,</span> <span class="string">&quot;external_gene_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;gene_biotype&quot;</span><span class="punctuation">,</span></span><br><span class="line">                                 <span class="string">&quot;chromosome_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;start_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;end_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;strand&quot;</span><span class="punctuation">,</span><span class="string">&quot;description&quot;</span><span class="punctuation">)</span><span class="punctuation">,</span> </span><br><span class="line">                    filters<span class="operator">=</span> <span class="string">&#x27;ensembl_gene_id&#x27;</span><span class="punctuation">,</span> value <span class="operator">=</span>diff_gene<span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>BioMart</tag>
+        <tag>gene annotate</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>glue学习</title>
     <url>/2022/09/26/glue/</url>
     <content><![CDATA[<h3 id="glue-处理字符串连接”-变量or表达式-”"><a href="#glue-处理字符串连接”-变量or表达式-”" class="headerlink" title="glue 处理字符串连接”{变量or表达式}”`"></a>glue 处理字符串连接”{变量or表达式}”`</h3><p>glue处理过后的字符串可以通过 + 和其他字符串进行连接，是可以接表达式</p>
@@ -111,26 +131,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Biomart对基因进行注释</title>
-    <url>/2022/09/25/Biomart%E5%AF%B9%E5%9F%BA%E5%9B%A0%E8%BF%9B%E8%A1%8C%E6%B3%A8%E9%87%8A/</url>
-    <content><![CDATA[<h3 id="对植物"><a href="#对植物" class="headerlink" title="对植物"></a>对植物</h3><p>mart要指定为plants_mart</p>
-<p>dataset指定物种数据库的名称</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">ensembl <span class="operator">=</span> useMart<span class="punctuation">(</span>biomart <span class="operator">=</span> <span class="string">&quot;plants_mart&quot;</span><span class="punctuation">,</span>host <span class="operator">=</span> <span class="string">&quot;http://plants.ensembl.org&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 列出可选择的植物</span></span><br><span class="line">listDatasets<span class="punctuation">(</span>ensembl<span class="punctuation">)</span>  </span><br><span class="line"></span><br><span class="line">ensembl <span class="operator">=</span> useMart<span class="punctuation">(</span>biomart <span class="operator">=</span> <span class="string">&quot;plants_mart&quot;</span><span class="punctuation">,</span>host <span class="operator">=</span> <span class="string">&quot;http://plants.ensembl.org&quot;</span><span class="punctuation">,</span>dataset<span class="operator">=</span><span class="string">&quot;sitalica_eg_gene&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">gene <span class="operator">&lt;-</span> read.table<span class="punctuation">(</span><span class="string">&quot;./128个基因.txt&quot;</span><span class="punctuation">)</span></span><br><span class="line">gene <span class="operator">&lt;-</span> gene<span class="operator">$</span>V1</span><br><span class="line"></span><br><span class="line">listAttributes<span class="punctuation">(</span>ensembl<span class="punctuation">)</span> <span class="operator">%&gt;%</span> View<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">gene_anno <span class="operator">&lt;-</span> getBM<span class="punctuation">(</span><span class="built_in">attributes</span><span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="string">&quot;ensembl_gene_id&quot;</span><span class="punctuation">,</span> <span class="string">&quot;gene_biotype&quot;</span><span class="punctuation">,</span></span><br><span class="line">                                 <span class="string">&quot;chromosome_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;start_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;end_position&quot;</span><span class="punctuation">,</span></span><br><span class="line">                                 <span class="string">&quot;strand&quot;</span><span class="punctuation">,</span><span class="string">&quot;description&quot;</span><span class="punctuation">,</span><span class="string">&quot;ensembl_peptide_id&quot;</span><span class="punctuation">,</span><span class="string">&quot;peptide&quot;</span><span class="punctuation">)</span><span class="punctuation">,</span> </span><br><span class="line">                    filters<span class="operator">=</span> <span class="string">&#x27;ensembl_gene_id&#x27;</span><span class="punctuation">,</span> value <span class="operator">=</span>gene<span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-<p><code>listAttributes(ensembl) %&gt;% View()</code></p>
-<p>列出可以添加的信息</p>
-<p><img src="/2022/09/25/Biomart%E5%AF%B9%E5%9F%BA%E5%9B%A0%E8%BF%9B%E8%A1%8C%E6%B3%A8%E9%87%8A/image-20220925204715975.png" alt="image-20220925204715975"></p>
-<h3 id="对动物"><a href="#对动物" class="headerlink" title="对动物"></a>对动物</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">listEnsembl<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">ensembl <span class="operator">&lt;-</span> useEnsembl<span class="punctuation">(</span>biomart <span class="operator">=</span> <span class="string">&quot;genes&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">listDatasets<span class="punctuation">(</span>ensembl<span class="punctuation">)</span></span><br><span class="line">ensembl <span class="operator">&lt;-</span> useDataset<span class="punctuation">(</span>dataset <span class="operator">=</span> <span class="string">&quot;mmusculus_gene_ensembl&quot;</span><span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">listAttributes<span class="punctuation">(</span>ensembl<span class="punctuation">)</span> <span class="operator">%&gt;%</span> View<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">martsymbol <span class="operator">&lt;-</span> getBM<span class="punctuation">(</span><span class="built_in">attributes</span><span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="string">&quot;ensembl_gene_id&quot;</span><span class="punctuation">,</span> <span class="string">&quot;external_gene_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;gene_biotype&quot;</span><span class="punctuation">,</span></span><br><span class="line">                                 <span class="string">&quot;chromosome_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;start_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;end_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;strand&quot;</span><span class="punctuation">,</span><span class="string">&quot;description&quot;</span><span class="punctuation">)</span><span class="punctuation">,</span> </span><br><span class="line">                    filters<span class="operator">=</span> <span class="string">&#x27;ensembl_gene_id&#x27;</span><span class="punctuation">,</span> value <span class="operator">=</span>diff_gene<span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <tags>
-        <tag>BioMart</tag>
-        <tag>gene annotate</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Hello World</title>
     <url>/2022/09/25/hello-world/</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
@@ -149,13 +149,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>test</title>
-    <url>/2022/09/25/test/</url>
-    <content><![CDATA[<p><img src="/2022/09/25/test/image-20220925210607257.png" alt="image-20220925210607257"></p>
-<p><img src="/2022/09/25/test/image-20220925212954196.png" alt="image-20220925212954196"></p>
-]]></content>
-  </entry>
-  <entry>
     <title>hexo教程</title>
     <url>/2022/09/25/hexo%E6%95%99%E7%A8%8B/</url>
     <content><![CDATA[<h1 id="githubio-hexo-使用"><a href="#githubio-hexo-使用" class="headerlink" title="githubio_hexo_使用"></a>githubio_hexo_使用</h1><p><code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</code></p>
@@ -169,5 +162,12 @@
       <tags>
         <tag>博客教程</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>test</title>
+    <url>/2022/09/25/test/</url>
+    <content><![CDATA[<p><img src="/2022/09/25/test/image-20220925210607257.png" alt="image-20220925210607257"></p>
+<p><img src="/2022/09/25/test/image-20220925212954196.png" alt="image-20220925212954196"></p>
+]]></content>
   </entry>
 </search>
