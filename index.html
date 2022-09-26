@@ -183,7 +183,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/26/glue%E5%AD%A6%E4%B9%A0/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/26/glue/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -197,7 +197,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/09/26/glue%E5%AD%A6%E4%B9%A0/" class="post-title-link" itemprop="url">glue学习</a>
+            <a href="/2022/09/26/glue/" class="post-title-link" itemprop="url">glue学习</a>
         </h2>
 
         <div class="post-meta">
@@ -208,7 +208,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-09-26 14:16:47 / Modified: 14:20:09" itemprop="dateCreated datePublished" datetime="2022-09-26T14:16:47+08:00">2022-09-26</time>
+              <time title="Created: 2022-09-26 14:16:47 / Modified: 20:14:45" itemprop="dateCreated datePublished" datetime="2022-09-26T14:16:47+08:00">2022-09-26</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -231,15 +231,104 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="glue-处理字符串连接"><a href="#glue-处理字符串连接" class="headerlink" title="### glue 处理字符串连接"></a>### glue 处理字符串连接</h2><p>glue处理过后的字符串可以通过 + 和其他字符串进行连接，是可以接表达式</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">library(glue)</span><br><span class="line">library(dplyr)</span><br><span class="line">## </span><br><span class="line">## 载入程辑包：&#x27;dplyr&#x27;</span><br><span class="line">## The following objects are masked from &#x27;package:stats&#x27;:</span><br><span class="line">## </span><br><span class="line">##     filter, lag</span><br><span class="line">## The following objects are masked from &#x27;package:base&#x27;:</span><br><span class="line">## </span><br><span class="line">##     intersect, setdiff, setequal, union</span><br><span class="line">me = &quot;junjie&quot;</span><br><span class="line">glue(&quot;my name is &#123;me&#125;&quot;)</span><br><span class="line">## my name is junjie</span><br><span class="line">glue(&quot;AAAA&quot;) + &quot;我是&#123;me&#125;&quot;</span><br><span class="line">## AAAA我是junjie</span><br><span class="line">glue(&quot;BB&quot;) + &quot;KK&quot; + getwd()</span><br><span class="line">## BBKKE:/R_practice</span><br></pre></td></tr></table></figure>
+          <h3 id="glue-处理字符串连接”-变量or表达式-”"><a href="#glue-处理字符串连接”-变量or表达式-”" class="headerlink" title="glue 处理字符串连接”{变量or表达式}”`"></a>glue 处理字符串连接”{变量or表达式}”`</h3><p>glue处理过后的字符串可以通过 + 和其他字符串进行连接，是可以接表达式</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">library<span class="punctuation">(</span>glue<span class="punctuation">)</span></span><br><span class="line">library<span class="punctuation">(</span>dplyr<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
-<h3 id="在数据框中的使用"><a href="#在数据框中的使用" class="headerlink" title="在数据框中的使用"></a>在数据框中的使用</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">mtcars %&gt;% glue_data(&quot;&#123;rownames(.)&#125; has &#123;hp&#125; hp&quot;)</span><br><span class="line">## Mazda RX4 has 110 hp</span><br><span class="line">## Mazda RX4 Wag has 110 hp</span><br><span class="line">## Datsun 710 has 93 hp</span><br><span class="line">## Hornet 4 Drive has 110 hp</span><br><span class="line">## Hornet Sportabout has 175 hp</span><br><span class="line">## Valiant has 105 hp</span><br><span class="line">## Duster 360 has 245 hp</span><br><span class="line">## Merc 240D has 62 hp</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">head(iris) %&gt;%</span><br><span class="line">  mutate(description = glue(&quot;This &#123;Species&#125; has a petal length of &#123;Petal.Length&#125;&quot;)) %&gt;% </span><br><span class="line">  pull(description)</span><br><span class="line">## This setosa has a petal length of 1.4</span><br><span class="line">## This setosa has a petal length of 1.4</span><br><span class="line">## This setosa has a petal length of 1.3</span><br><span class="line">## This setosa has a petal length of 1.5</span><br><span class="line">## This setosa has a petal length of 1.4</span><br><span class="line">## This setosa has a petal length of 1.7</span><br></pre></td></tr></table></figure>
+<pre><code>#&gt; 
+#&gt; 载入程辑包：&#39;dplyr&#39;
 
-<h3 id="字符串太长换行显示"><a href="#字符串太长换行显示" class="headerlink" title="字符串太长换行显示"></a>字符串太长换行显示</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">glue(</span><br><span class="line">  &quot;AAAAAAAAAAAA\\</span><br><span class="line">   BBBBBBBBBBBBBB\\</span><br><span class="line">   CCCC&quot;</span><br><span class="line">)</span><br><span class="line">## AAAAAAAAAAAABBBBBBBBBBBBBBCCCC</span><br><span class="line">glue(</span><br><span class="line">  &quot;AAAAAAAAAAAA\n\\</span><br><span class="line">BBBBBBBBBBBBBB\n\\</span><br><span class="line">  CCCC&quot;</span><br><span class="line">)</span><br><span class="line">## AAAAAAAAAAAA</span><br><span class="line">## BBBBBBBBBBBBBB</span><br><span class="line">##   CCCC</span><br></pre></td></tr></table></figure>
+#&gt; The following objects are masked from &#39;package:stats&#39;:
+#&gt; 
+#&gt;     filter, lag
 
-<h3 id="字符串向量合并"><a href="#字符串向量合并" class="headerlink" title="字符串向量合并"></a>字符串向量合并</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">glue_collapse(glue(&quot;&#123;1:10&#125;&quot;))</span><br><span class="line">## 12345678910</span><br></pre></td></tr></table></figure>
+#&gt; The following objects are masked from &#39;package:base&#39;:
+#&gt; 
+#&gt;     intersect, setdiff, setequal, union
+</code></pre>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">me <span class="operator">=</span> <span class="string">&quot;junjie&quot;</span></span><br><span class="line">glue<span class="punctuation">(</span><span class="string">&quot;my name is &#123;me&#125;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
+<pre><code>#&gt; my name is junjie
+</code></pre>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">glue<span class="punctuation">(</span><span class="string">&quot;AAAA&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> <span class="string">&quot;我是&#123;me&#125;&quot;</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; AAAA我是junjie
+</code></pre>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">glue<span class="punctuation">(</span><span class="string">&quot;BB&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> <span class="string">&quot;KK&quot;</span> <span class="operator">+</span> getwd<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; BBKKE:/R_practice
+</code></pre>
+<h3 id="在数据框中的使用"><a href="#在数据框中的使用" class="headerlink" title="在数据框中的使用"></a>在数据框中的使用</h3><figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mtcars <span class="operator">%&gt;%</span> glue_data<span class="punctuation">(</span><span class="string">&quot;&#123;rownames(.)&#125; has &#123;hp&#125; hp&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Mazda RX4 has 110 hp
+#&gt; Mazda RX4 Wag has 110 hp
+#&gt; Datsun 710 has 93 hp
+#&gt; Hornet 4 Drive has 110 hp
+#&gt; Hornet Sportabout has 175 hp
+#&gt; Valiant has 105 hp
+#&gt; Duster 360 has 245 hp
+#&gt; Merc 240D has 62 hp
+#&gt; Merc 230 has 95 hp
+#&gt; Merc 280 has 123 hp
+#&gt; Merc 280C has 123 hp
+#&gt; Merc 450SE has 180 hp
+#&gt; Merc 450SL has 180 hp
+#&gt; Merc 450SLC has 180 hp
+#&gt; Cadillac Fleetwood has 205 hp
+#&gt; Lincoln Continental has 215 hp
+#&gt; Chrysler Imperial has 230 hp
+#&gt; Fiat 128 has 66 hp
+#&gt; Honda Civic has 52 hp
+#&gt; Toyota Corolla has 65 hp
+#&gt; Toyota Corona has 97 hp
+#&gt; Dodge Challenger has 150 hp
+#&gt; AMC Javelin has 150 hp
+#&gt; Camaro Z28 has 245 hp
+#&gt; Pontiac Firebird has 175 hp
+#&gt; Fiat X1-9 has 66 hp
+#&gt; Porsche 914-2 has 91 hp
+#&gt; Lotus Europa has 113 hp
+#&gt; Ford Pantera L has 264 hp
+#&gt; Ferrari Dino has 175 hp
+#&gt; Maserati Bora has 335 hp
+#&gt; Volvo 142E has 109 hp
+</code></pre>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">head<span class="punctuation">(</span>iris<span class="punctuation">)</span> <span class="operator">%&gt;%</span></span><br><span class="line">  mutate<span class="punctuation">(</span>description <span class="operator">=</span> glue<span class="punctuation">(</span><span class="string">&quot;This &#123;Species&#125; has a petal length of &#123;Petal.Length&#125;&quot;</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">%&gt;%</span> </span><br><span class="line">  pull<span class="punctuation">(</span>description<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; This setosa has a petal length of 1.4
+#&gt; This setosa has a petal length of 1.4
+#&gt; This setosa has a petal length of 1.3
+#&gt; This setosa has a petal length of 1.5
+#&gt; This setosa has a petal length of 1.4
+#&gt; This setosa has a petal length of 1.7
+</code></pre>
+<h3 id="字符串太长换行显示"><a href="#字符串太长换行显示" class="headerlink" title="字符串太长换行显示::"></a>字符串太长换行显示::</h3><figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">glue<span class="punctuation">(</span></span><br><span class="line">  <span class="string">&quot;AAAAAAAAAAAA\\</span></span><br><span class="line"><span class="string">   BBBBBBBBBBBBBB\\</span></span><br><span class="line"><span class="string">   CCCC&quot;</span></span><br><span class="line"><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<div class="cell-output cell-output-stdout">
+
+<pre><code>#&gt; AAAAAAAAAAAABBBBBBBBBBBBBBCCCC
+</code></pre>
+</div>
+
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">glue<span class="punctuation">(</span></span><br><span class="line">  <span class="string">&quot;AAAAAAAAAAAA\n\\</span></span><br><span class="line"><span class="string">BBBBBBBBBBBBBB\n\\</span></span><br><span class="line"><span class="string">  CCCC&quot;</span></span><br><span class="line"><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<div class="cell-output cell-output-stdout">
+
+<pre><code>#&gt; AAAAAAAAAAAA
+#&gt; BBBBBBBBBBBBBB
+#&gt;   CCCC
+</code></pre>
+</div>
+
+<p>:::</p>
+<h3 id="字符串向量合并"><a href="#字符串向量合并" class="headerlink" title="字符串向量合并::"></a>字符串向量合并::</h3><figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">glue_collapse<span class="punctuation">(</span>glue<span class="punctuation">(</span><span class="string">&quot;&#123;1:10&#125;&quot;</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<div class="cell-output cell-output-stdout">
+
+<pre><code>#&gt; 12345678910
+</code></pre>
+</div>
+
+<p>:::</p>
 
       
     </div>
