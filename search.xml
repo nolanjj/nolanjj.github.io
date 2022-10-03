@@ -21,21 +21,6 @@
       </tags>
   </entry>
   <entry>
-    <title>hexo教程</title>
-    <url>/2022/09/25/hexo%E6%95%99%E7%A8%8B/</url>
-    <content><![CDATA[<h1 id="githubio-hexo-使用"><a href="#githubio-hexo-使用" class="headerlink" title="githubio_hexo_使用"></a>githubio_hexo_使用</h1><p><code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</code></p>
-<h3 id="参考视频"><a href="#参考视频" class="headerlink" title="参考视频"></a>参考视频</h3><p><a href="https://www.bilibili.com/video/BV1mU4y1j72n/?p=5&spm_id_from=pageDriver&vd_source=054bcf480436b1c4a589dd66453c235a">发布博客到互联网_哔哩哔哩_bilibili</a></p>
-<h3 id="视频笔记"><a href="#视频笔记" class="headerlink" title="视频笔记"></a>视频笔记</h3><p><a href="https://www.bilibili.com/h5/note-app/view?cvid=14840804&pagefrom=comment">笔记详情 (bilibili.com)</a></p>
-<h3 id="报错解决"><a href="#报错解决" class="headerlink" title="报错解决"></a>报错解决</h3><p><a href="https://blog.csdn.net/qq_45685435/article/details/119863595">git报错:fatal: unable to auto-detect email address，我试错10多遍，我太难了_少年，又是你的博客-CSDN博客</a></p>
-<h3 id="配置及详细使用"><a href="#配置及详细使用" class="headerlink" title="配置及详细使用"></a>配置及详细使用</h3><p><a href="https://www.bilibili.com/video/BV1444y1179K/?spm_id_from=pageDriver&vd_source=054bcf480436b1c4a589dd66453c235a">使用Hexo搭建个人博客手摸手教学(6)|配置文件说明及常用命令_哔哩哔哩_bilibili</a></p>
-<p><a href="https://blog.csdn.net/qq_38140292/article/details/119076400">【hexo】基础教程-一-撰写文章_指尖听戏的博客-CSDN博客_hexo博客怎么写文章</a></p>
-<h3 id="显示图片"><a href="#显示图片" class="headerlink" title="显示图片"></a>显示图片</h3><p>参考：<br><a href="https://oldgerman.github.io/eeea93b8/">https://oldgerman.github.io/eeea93b8/</a><br>安装<br>npm install <a href="https://github.com/CodeFalling/hexo-asset-image">https://github.com/CodeFalling/hexo-asset-image</a> –save</p>
-]]></content>
-      <tags>
-        <tag>博客教程</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Hello World</title>
     <url>/2022/09/25/hello-world/</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
@@ -51,13 +36,6 @@
 <h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
 
 <p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>test</title>
-    <url>/2022/09/25/test/</url>
-    <content><![CDATA[<p><img src="/2022/09/25/test/image-20220925210607257.png" alt="image-20220925210607257"></p>
-<p><img src="/2022/09/25/test/image-20220925212954196.png" alt="image-20220925212954196"></p>
 ]]></content>
   </entry>
   <entry>
@@ -171,101 +149,51 @@
       </tags>
   </entry>
   <entry>
-    <title>WGCNA教程</title>
-    <url>/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/</url>
-    <content><![CDATA[<h1 id="WGCNA教程"><a href="#WGCNA教程" class="headerlink" title="WGCNA教程"></a>WGCNA教程</h1><h2 id="计算流程及原理"><a href="#计算流程及原理" class="headerlink" title="计算流程及原理"></a>计算流程及原理</h2><p>1.计算基因间person相关系数 cor(i,j)</p>
-<p>2.计算Sij, 以构建无向网络 or 有向网络，对于无向网络，由于取绝对值，正负相关的基因最后聚类为一个模块，对于有向网络，正相关 负相关基因得到的Sij是不一样的，最终聚类则不再同一模块。</p>
-<p><img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001092619182.png" alt="image-20221001092619182"></p>
-<p>3.计算得到邻接矩阵aij， 这里的β就是代码里的power， 通过β次方，强化强相关，弱化弱相关，基因间关符合无尺度网络分布（R方达到0.85）</p>
-<p><img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001092655021.png" alt="image-20221001092655021"></p>
-<p>4.计算得到拓扑重叠矩阵TOM，根据公式可知<br>两个基因的相关性不仅取决于这两个基因的表达量计算得到的值，还取决于这两个基因与这两个基因除外的所有基因的的相关性程度。</p>
-<p><img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001092701718.png" alt="image-20221001092701718"></p>
-<p>5.TOM矩阵转化为dissTOM用于基因聚类和模块的划分</p>
-<p><code>dissTOM = 1- TOM</code></p>
-<p><code>geneTree = hclust(as.dist(dissTOM), method = &quot;average&quot;)</code></p>
-<img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001093528258.png" alt="image-20221001093528258" style="zoom:50%;">
+    <title>hexo教程</title>
+    <url>/2022/09/25/hexo%E6%95%99%E7%A8%8B/</url>
+    <content><![CDATA[<h1 id="githubio-hexo-使用"><a href="#githubio-hexo-使用" class="headerlink" title="githubio_hexo_使用"></a>githubio_hexo_使用</h1><p><code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</code></p>
+<h3 id="参考视频"><a href="#参考视频" class="headerlink" title="参考视频"></a>参考视频</h3><p><a href="https://www.bilibili.com/video/BV1mU4y1j72n/?p=5&spm_id_from=pageDriver&vd_source=054bcf480436b1c4a589dd66453c235a">发布博客到互联网_哔哩哔哩_bilibili</a></p>
+<h3 id="视频笔记"><a href="#视频笔记" class="headerlink" title="视频笔记"></a>视频笔记</h3><p><a href="https://www.bilibili.com/h5/note-app/view?cvid=14840804&pagefrom=comment">笔记详情 (bilibili.com)</a></p>
+<h3 id="报错解决"><a href="#报错解决" class="headerlink" title="报错解决"></a>报错解决</h3><p><a href="https://blog.csdn.net/qq_45685435/article/details/119863595">git报错:fatal: unable to auto-detect email address，我试错10多遍，我太难了_少年，又是你的博客-CSDN博客</a></p>
+<h3 id="配置及详细使用"><a href="#配置及详细使用" class="headerlink" title="配置及详细使用"></a>配置及详细使用</h3><p><a href="https://www.bilibili.com/video/BV1444y1179K/?spm_id_from=pageDriver&vd_source=054bcf480436b1c4a589dd66453c235a">使用Hexo搭建个人博客手摸手教学(6)|配置文件说明及常用命令_哔哩哔哩_bilibili</a></p>
+<p><a href="https://blog.csdn.net/qq_38140292/article/details/119076400">【hexo】基础教程-一-撰写文章_指尖听戏的博客-CSDN博客_hexo博客怎么写文章</a></p>
+<h3 id="显示图片"><a href="#显示图片" class="headerlink" title="显示图片"></a>显示图片</h3><p>参考：<br><a href="https://oldgerman.github.io/eeea93b8/">https://oldgerman.github.io/eeea93b8/</a><br>安装<br>npm install <a href="https://github.com/CodeFalling/hexo-asset-image">https://github.com/CodeFalling/hexo-asset-image</a> –save</p>
+]]></content>
+      <tags>
+        <tag>博客教程</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>quarto_test</title>
+    <url>/2022/10/03/quarto_test/</url>
+    <content><![CDATA[<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">plot<span class="punctuation">(</span>mtcars<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
-<p>之后就是根据基因聚类的情况划分得到模块，具体怎么划分</p>
-<p>用到了cutreeDynamic这个函数，动态树切割的算法</p>
-<p>参考：<a href="https://peterlangfelder.com/2018/12/30/why-wgcna-modules-dont-always-agree-with-the-dendrogram/">Why WGCNA modules don’t always agree with the dendrogram? – Insights from a billion correlations (peterlangfelder.com)</a></p>
-<p>6.最后就得到模块了</p>
-<p>上述这些步骤就是通过 blockwiseModules 一步来完成</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">net <span class="operator">=</span> blockwiseModules<span class="punctuation">(</span>data<span class="punctuation">,</span> power <span class="operator">=</span> power<span class="punctuation">,</span> maxBlockSize <span class="operator">=</span> max_blockSize<span class="punctuation">,</span>        </span><br><span class="line">                       networkType <span class="operator">=</span> net_type<span class="punctuation">,</span></span><br><span class="line">                       minModuleSize <span class="operator">=</span><span class="number">30</span><span class="punctuation">,</span>          </span><br><span class="line">                       reassignThreshold <span class="operator">=</span> <span class="number">0</span><span class="punctuation">,</span> </span><br><span class="line">                       mergeCutHeight <span class="operator">=</span> <span class="number">0.2</span><span class="punctuation">,</span>        <span class="comment"># mergeCutHeight是模块融合的阈值</span></span><br><span class="line">                       numericLabels <span class="operator">=</span> <span class="literal">TRUE</span><span class="punctuation">,</span> </span><br><span class="line">                       pamRespectsDendro <span class="operator">=</span> <span class="literal">FALSE</span><span class="punctuation">,</span></span><br><span class="line">                       saveTOMs <span class="operator">=</span> <span class="literal">TRUE</span><span class="punctuation">,</span></span><br><span class="line">                       saveTOMFileBase <span class="operator">=</span> paste0<span class="punctuation">(</span>out_path<span class="punctuation">,</span><span class="string">&quot;/RData/TOM&quot;</span><span class="punctuation">)</span><span class="punctuation">,</span> <span class="comment"># 保存TOM矩阵的数据</span></span><br><span class="line">                       verbose <span class="operator">=</span> <span class="number">3</span><span class="punctuation">)</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<img src="/2022/10/03/quarto_test/figure-gfm/unnamed-chunk-1-1.png" width="768">
 
+<h2 id="Quarto"><a href="#Quarto" class="headerlink" title="Quarto"></a>Quarto</h2><p>Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <a href="https://quarto.org/">https://quarto.org</a>.</p>
+<h2 id="Running-Code"><a href="#Running-Code" class="headerlink" title="Running Code"></a>Running Code</h2><p>When you click the <strong>Render</strong> button a document will be generated that includes both content and the output of embedded code. You can embed code like this:</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="number">1</span> <span class="operator">+</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
 
-
-<p>得到模块，知道基因都属于那个模块就可以计算出<strong>模块特征基因MEs</strong></p>
-<p>模块内的基因都是表达高度相似的基因</p>
-<p>MEs可以理解为将这些模块内所有基因压缩围为一个基因</p>
-<p>用这个基因可以代表整体的一个表达情况 这个基因就是<strong>模块特征基因MEs</strong></p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">MEs0 <span class="operator">=</span> moduleEigengenes<span class="punctuation">(</span>data<span class="punctuation">,</span> moduleColors<span class="punctuation">)</span><span class="operator">$</span>eigengenes          </span><br><span class="line">MEs <span class="operator">=</span> orderMEs<span class="punctuation">(</span>MEs0<span class="punctuation">)</span>                             </span><br><span class="line">head<span class="punctuation">(</span>MEs<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001094509891.png" alt="image-20221001094509891"></p>
-<p>比如 turquoise模块的特征基因MEs，说明基因整体的表达情况就是在红色圆框框起来的样本里表达比较高</p>
-<p>看一个更直观的</p>
-<img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001095300424.png" alt="image-20221001095300424" style="zoom:50%;">
-
-
-
-
-
-<h3 id="模块特征基因MEs-关联-trait"><a href="#模块特征基因MEs-关联-trait" class="headerlink" title="模块特征基因MEs 关联 trait"></a>模块特征基因MEs 关联 trait</h3><p><code>moduleTraitCor = cor(MEs,trait, use = &quot;p&quot;)</code></p>
-<p><code>moduleTraitPvalue = corPvalueStudent(moduleTraitCor, nSamples)</code></p>
-<p>计算了MEs 和 trait的相关系数和pvalue</p>
-<p><img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001095551227.png" alt="image-20221001095551227"></p>
-<p>这也是为甚么我们需要把trait转换成0-1矩阵。只有这样分类变量才能进行计算</p>
-<p>如果是年龄 体重等连续变量则不需要转化</p>
-<p><img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001095934009.png" alt="image-20221001095934009"></p>
-<p>根据这个图我们就可以根据pvalue 小于0.05的选出与trait相关的模块了</p>
-<h3 id="GS-MM-散点图"><a href="#GS-MM-散点图" class="headerlink" title="GS MM 散点图"></a>GS MM 散点图</h3><p><strong>MM：</strong> 基因和模块特征基因MEs相关性</p>
-<p><code>geneModuleMembership = as.data.frame(cor(data, tmp_MEs, use = &quot;p&quot;)) %&gt;%    rename_with(~paste0(&quot;MM.&quot;,.))</code></p>
-<p><img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001100616225.png" alt="image-20221001100616225"></p>
-<p><strong>GS：</strong>基因和trait的相关性</p>
-<p><code>  geneTraitSignificance = as.data.frame(cor(data, trait_select, use = &quot;p&quot;)) %&gt;%      set_names(paste(&quot;GS.&quot;, trait_col , sep=&quot;&quot;))</code></p>
-<p>下图显示了基因和KC计算得到的相关系数</p>
-<p><img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001100754193.png" alt="image-20221001100754193"></p>
-<p><strong>接下来就是 GS MM 散点图的绘制</strong></p>
-<p>这里 <code>abs(geneModuleMembership[moduleGenes,paste0(&quot;MM.&quot;,module)]</code></p>
-<p>做了两个处理一个是<strong>moduleGenes</strong>选出模块内的基因</p>
-<p>另一个是取绝对值<strong>abs</strong></p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">verboseScatterplot<span class="punctuation">(</span><span class="built_in">abs</span><span class="punctuation">(</span>geneModuleMembership<span class="punctuation">[</span>moduleGenes<span class="punctuation">,</span>paste0<span class="punctuation">(</span><span class="string">&quot;MM.&quot;</span><span class="punctuation">,</span>module<span class="punctuation">)</span><span class="punctuation">]</span><span class="punctuation">)</span><span class="punctuation">,</span>         </span><br><span class="line"><span class="built_in">abs</span><span class="punctuation">(</span>geneTraitSignificance<span class="punctuation">[</span>moduleGenes<span class="punctuation">,</span> <span class="number">1</span><span class="punctuation">]</span><span class="punctuation">)</span><span class="punctuation">,</span></span><br><span class="line">xlab <span class="operator">=</span> paste<span class="punctuation">(</span><span class="string">&quot;Module Membership in&quot;</span><span class="punctuation">,</span> module<span class="punctuation">,</span> <span class="string">&quot;module&quot;</span><span class="punctuation">)</span><span class="punctuation">,</span></span><br><span class="line">ylab <span class="operator">=</span> <span class="string">&quot;Gene significance&quot;</span><span class="punctuation">,</span></span><br><span class="line">main <span class="operator">=</span> paste<span class="punctuation">(</span><span class="string">&quot;Module membership vs. gene significance\n&quot;</span><span class="punctuation">)</span><span class="punctuation">,</span></span><br><span class="line">cex.main <span class="operator">=</span> <span class="number">1.2</span><span class="punctuation">,</span> cex.lab <span class="operator">=</span> <span class="number">1.2</span><span class="punctuation">,</span> cex.axis <span class="operator">=</span> <span class="number">1.2</span><span class="punctuation">,</span> col <span class="operator">=</span> module<span class="punctuation">)</span> </span><br><span class="line">    </span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001101341999.png" alt="image-20221001101341999" style="zoom:67%;">
-
-
-
-<h3 id="计算基因的连接度"><a href="#计算基因的连接度" class="headerlink" title="计算基因的连接度"></a>计算基因的连接度</h3><p>一行代码搞定</p>
-<p><code>connect &lt;- intramodularConnectivity(adj_matrix, colors = moduleColors)</code></p>
-<p><img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001101645949.png" alt="image-20221001101645949"></p>
-<p><strong>kWithin</strong> : 模块内连接度，即该基因与该基因所在模块的其他基因的相关系数的总和，越大就说明与模块内其他基因关系越紧密，处于中心地位。</p>
-<h3 id="Cytoscape"><a href="#Cytoscape" class="headerlink" title="Cytoscape"></a>Cytoscape</h3><p><img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001104859526.png" alt="image-20221001104859526"></p>
-<p><strong>Cytoscape 教程参考：</strong></p>
-<p><a href="https://www.jianshu.com/p/d75e1199f8b1">https://www.jianshu.com/p/d75e1199f8b1</a></p>
-<p><a href="https://cloud.tencent.com/developer/article/1437752">https://cloud.tencent.com/developer/article/1437752</a></p>
-<h2 id="FAQ"><a href="#FAQ" class="headerlink" title="FAQ"></a>FAQ</h2><p><a href="https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/faq.html">WGCNA package: Frequently Asked Questions (ucla.edu)</a></p>
-<h3 id="没有合适的power使R方到达0-85"><a href="#没有合适的power使R方到达0-85" class="headerlink" title="没有合适的power使R方到达0.85"></a>没有合适的power使R方到达0.85</h3><p><img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001102528245.png" alt="image-20221001102528245"></p>
-<h3 id="输入数据的要求"><a href="#输入数据的要求" class="headerlink" title="输入数据的要求"></a>输入数据的要求</h3><p><strong>总之需要标准化，FPKM TPM CPM log处理 ，Count做VST转换 等都ok，能出来满意的结果就是做好的</strong></p>
-<p><img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001102804647.png" alt="image-20221001102804647"></p>
-<h3 id="样本数量要求-和过滤基因方法选择"><a href="#样本数量要求-和过滤基因方法选择" class="headerlink" title="样本数量要求 和过滤基因方法选择"></a>样本数量要求 和过滤基因方法选择</h3><p>不要用差异基因，因为不符合无尺度网络的假设</p>
-<p>即少数几个节点处于中心地位与其他节点紧密联系，大多数节点属于边缘位置，与其他节点联系疏松</p>
-<p><img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001103003782.png" alt="image-20221001103003782"></p>
-<h3 id="signed-unsigned-怎么选"><a href="#signed-unsigned-怎么选" class="headerlink" title="signed unsigned 怎么选"></a>signed unsigned 怎么选</h3><p>作者推荐用signed</p>
-<p> 通过 <code>networkType</code> 设置</p>
-<p><code>TOMType</code> 这个参数 跟 <code>networkType</code> 保持一样就行。</p>
-<p><a href="https://peterlangfelder.com/2018/11/25/signed-or-unsigned-which-network-type-is-preferable/">Signed or unsigned: which network type is preferable? – Insights from a billion correlations (peterlangfelder.com)</a></p>
-<h2 id="一些补充"><a href="#一些补充" class="headerlink" title="一些补充"></a>一些补充</h2><h3 id="代码太长看不懂"><a href="#代码太长看不懂" class="headerlink" title="代码太长看不懂"></a><strong>代码太长看不懂</strong></h3><p><img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001105214342.png" alt="image-20221001105214342"></p>
-<p><strong>选中其中部分代码 Ctrl + Enter 运行 看看结果</strong> </p>
-<h3 id="for-循环不知到在干嘛"><a href="#for-循环不知到在干嘛" class="headerlink" title="for 循环不知到在干嘛"></a>for 循环不知到在干嘛</h3><p>不要直接运行整个for循环</p>
-<p>运行for内部的代码</p>
-<p><img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001105707833.png" alt="image-20221001105707833"></p>
-<h3 id="函数啥意思"><a href="#函数啥意思" class="headerlink" title="函数啥意思"></a>函数啥意思</h3><p><img src="/2022/10/01/20220930_WGCNA_v0.1_clean/WGCNA_note_v0.1/image-20221001110001722.png" alt="image-20221001110001722"></p>
-<p>光标放到函数括号内，按table会显示参数，再按F1Rstudio右边出现帮助问文档，自己看</p>
+<pre><code>[1] 2
+</code></pre>
+<p>You can add options to executable code like this</p>
+<pre><code>[1] 4
+</code></pre>
+<p>The <code>echo: false</code> option disables the printing of code (only output is displayed).</p>
 ]]></content>
       <categories>
         <category>R</category>
       </categories>
       <tags>
-        <tag>WGCNA</tag>
+        <tag>R</tag>
+        <tag>tidy</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>test</title>
+    <url>/2022/09/25/test/</url>
+    <content><![CDATA[<p><img src="/2022/09/25/test/image-20220925210607257.png" alt="image-20220925210607257"></p>
+<p><img src="/2022/09/25/test/image-20220925212954196.png" alt="image-20220925212954196"></p>
+]]></content>
   </entry>
 </search>
