@@ -255,6 +255,67 @@ lapply(list(1:3, 4:5), `+`, 100)
       </tags>
   </entry>
   <entry>
+    <title>adv-R_22debug</title>
+    <url>/2022/10/06/adv-R_22debu/</url>
+    <content><![CDATA[<h3 id="Locating-errors"><a href="#Locating-errors" class="headerlink" title="Locating errors"></a><strong>Locating errors</strong></h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>a<span class="punctuation">)</span> g<span class="punctuation">(</span>a<span class="punctuation">)</span></span><br><span class="line">g <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>b<span class="punctuation">)</span> h<span class="punctuation">(</span>b<span class="punctuation">)</span></span><br><span class="line">h <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="built_in">c</span><span class="punctuation">)</span> i<span class="punctuation">(</span><span class="built_in">c</span><span class="punctuation">)</span></span><br><span class="line">i <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>d<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  <span class="keyword">if</span> <span class="punctuation">(</span><span class="operator">!</span><span class="built_in">is.numeric</span><span class="punctuation">(</span>d<span class="punctuation">)</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    stop<span class="punctuation">(</span><span class="string">&quot;`d` must be numeric&quot;</span><span class="punctuation">,</span> call. <span class="operator">=</span> <span class="literal">FALSE</span><span class="punctuation">)</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line">  d <span class="operator">+</span> <span class="number">10</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line">f<span class="punctuation">(</span><span class="string">&quot;a&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Error: `d` must be numeric
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 点击报错右边的 Show Trackback 定位报错位置</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 或者 用过 traceback() 函数 </span></span><br><span class="line">traceback<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; No traceback available
+</code></pre>
+<h3 id="涉及-lazy-evaluation-使用-rlang-last-trace-rlang-abort"><a href="#涉及-lazy-evaluation-使用-rlang-last-trace-rlang-abort" class="headerlink" title="涉及 lazy evaluation 使用 rlang::last_trace() rlang::abort()"></a>涉及 lazy evaluation 使用 rlang::last_trace() rlang::abort()</h3><p>Traceback ()的一个缺点是它总是线性化调用树，如果涉及大量的惰性计算，这可能会造成混淆</p>
+<p>使用 rlang: : with _ abort ()和 rlang: : last _ trace ()查看调用树。在这里，我认为这让我们更容易看到问题的根源</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># j函数调用k函数 k函数返回stop</span></span><br><span class="line">j <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> k<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">k <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> stop<span class="punctuation">(</span><span class="string">&quot;Oops!&quot;</span><span class="punctuation">,</span> call. <span class="operator">=</span> <span class="literal">FALSE</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">j<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Error: Oops!
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f<span class="punctuation">(</span>j<span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Error: Oops!
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">traceback<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; No traceback available
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">rlang<span class="operator">::</span>abort<span class="punctuation">(</span>f<span class="punctuation">(</span>j<span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Error: Oops!
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">rlang<span class="operator">::</span>last_trace<span class="punctuation">(</span>f<span class="punctuation">(</span>j<span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Error: Can&#39;t show last error because no error was recorded yet
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="number">1</span><span class="operator">+</span>a</span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Error in eval(expr, envir, enclos): object &#39;a&#39; not found
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">rlang<span class="operator">::</span>last_trace<span class="punctuation">(</span><span class="number">1</span><span class="operator">+</span>a<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Error: Can&#39;t show last error because no error was recorded yet
+</code></pre>
+<h3 id="Interactive-debugger"><a href="#Interactive-debugger" class="headerlink" title="Interactive debugger"></a><strong>Interactive debugger</strong></h3><p>函数报错 则在函数内部插入 browser() 运行到 browser()便出现互交的调试界面</p>
+<p>跟pycharm一样方便的调试</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">g <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>b<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  <span class="built_in">browser</span><span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">  h<span class="punctuation">(</span>b<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">f<span class="punctuation">(</span><span class="number">10</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Called from: g(a)
+#&gt; debug at &lt;text&gt;#3: h(b)
+
+#&gt; [1] 20
+</code></pre>
+<h4 id><a href="#" class="headerlink" title></a></h4><p><strong>Breakpoints</strong><br>可以通过单击行号左侧或按 Shift + F9来设置断点。断点的行为类似于浏览器() ，但它们更容易设置(单击一次而不是按9次键) ，并且不会冒险在源代码中意外包含一个浏览器()语句。断点有两个小小的缺点:</p>
+]]></content>
+      <categories>
+        <category>R</category>
+      </categories>
+      <tags>
+        <tag>adv-R</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>efficient R programming</title>
     <url>/2022/10/06/efficient%20R%20programming%20%E7%AC%94%E8%AE%B0/</url>
     <content><![CDATA[<h2 id><a href="#" class="headerlink" title></a></h2><h2 id="书本网址："><a href="#书本网址：" class="headerlink" title="书本网址："></a>书本网址：</h2><p><a href="https://csgillespie.github.io/efficientR/programming.html#ref-Wickham2014">3 Efficient programming | Efficient R programming (csgillespie.github.io)</a></p>
@@ -322,65 +383,37 @@ lapply(list(1:3, 4:5), `+`, 100)
       </tags>
   </entry>
   <entry>
-    <title>adv-R_22debug</title>
-    <url>/2022/10/06/adv-R_22debu/</url>
-    <content><![CDATA[<h3 id="Locating-errors"><a href="#Locating-errors" class="headerlink" title="Locating errors"></a><strong>Locating errors</strong></h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>a<span class="punctuation">)</span> g<span class="punctuation">(</span>a<span class="punctuation">)</span></span><br><span class="line">g <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>b<span class="punctuation">)</span> h<span class="punctuation">(</span>b<span class="punctuation">)</span></span><br><span class="line">h <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="built_in">c</span><span class="punctuation">)</span> i<span class="punctuation">(</span><span class="built_in">c</span><span class="punctuation">)</span></span><br><span class="line">i <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>d<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  <span class="keyword">if</span> <span class="punctuation">(</span><span class="operator">!</span><span class="built_in">is.numeric</span><span class="punctuation">(</span>d<span class="punctuation">)</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    stop<span class="punctuation">(</span><span class="string">&quot;`d` must be numeric&quot;</span><span class="punctuation">,</span> call. <span class="operator">=</span> <span class="literal">FALSE</span><span class="punctuation">)</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line">  d <span class="operator">+</span> <span class="number">10</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line">f<span class="punctuation">(</span><span class="string">&quot;a&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error: `d` must be numeric
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 点击报错右边的 Show Trackback 定位报错位置</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 或者 用过 traceback() 函数 </span></span><br><span class="line">traceback<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; No traceback available
-</code></pre>
-<h3 id="涉及-lazy-evaluation-使用-rlang-last-trace-rlang-abort"><a href="#涉及-lazy-evaluation-使用-rlang-last-trace-rlang-abort" class="headerlink" title="涉及 lazy evaluation 使用 rlang::last_trace() rlang::abort()"></a>涉及 lazy evaluation 使用 rlang::last_trace() rlang::abort()</h3><p>Traceback ()的一个缺点是它总是线性化调用树，如果涉及大量的惰性计算，这可能会造成混淆</p>
-<p>使用 rlang: : with _ abort ()和 rlang: : last _ trace ()查看调用树。在这里，我认为这让我们更容易看到问题的根源</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># j函数调用k函数 k函数返回stop</span></span><br><span class="line">j <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> k<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">k <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> stop<span class="punctuation">(</span><span class="string">&quot;Oops!&quot;</span><span class="punctuation">,</span> call. <span class="operator">=</span> <span class="literal">FALSE</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">j<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error: Oops!
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f<span class="punctuation">(</span>j<span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error: Oops!
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">traceback<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; No traceback available
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">rlang<span class="operator">::</span>abort<span class="punctuation">(</span>f<span class="punctuation">(</span>j<span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error: Oops!
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">rlang<span class="operator">::</span>last_trace<span class="punctuation">(</span>f<span class="punctuation">(</span>j<span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error: Can&#39;t show last error because no error was recorded yet
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="number">1</span><span class="operator">+</span>a</span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error in eval(expr, envir, enclos): object &#39;a&#39; not found
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">rlang<span class="operator">::</span>last_trace<span class="punctuation">(</span><span class="number">1</span><span class="operator">+</span>a<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error: Can&#39;t show last error because no error was recorded yet
-</code></pre>
-<h3 id="Interactive-debugger"><a href="#Interactive-debugger" class="headerlink" title="Interactive debugger"></a><strong>Interactive debugger</strong></h3><p>函数报错 则在函数内部插入 browser() 运行到 browser()便出现互交的调试界面</p>
-<p>跟pycharm一样方便的调试</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">g <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>b<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  <span class="built_in">browser</span><span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">  h<span class="punctuation">(</span>b<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">f<span class="punctuation">(</span><span class="number">10</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Called from: g(a)
-#&gt; debug at &lt;text&gt;#3: h(b)
-
-#&gt; [1] 20
-</code></pre>
-<h4 id><a href="#" class="headerlink" title></a></h4><p><strong>Breakpoints</strong><br>可以通过单击行号左侧或按 Shift + F9来设置断点。断点的行为类似于浏览器() ，但它们更容易设置(单击一次而不是按9次键) ，并且不会冒险在源代码中意外包含一个浏览器()语句。断点有两个小小的缺点:</p>
+    <title>hexo教程</title>
+    <url>/2022/09/25/hexo%E6%95%99%E7%A8%8B/</url>
+    <content><![CDATA[<h1 id="githubio-hexo-使用"><a href="#githubio-hexo-使用" class="headerlink" title="githubio_hexo_使用"></a>githubio_hexo_使用</h1><p><code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</code></p>
+<h3 id="参考视频"><a href="#参考视频" class="headerlink" title="参考视频"></a>参考视频</h3><p><a href="https://www.bilibili.com/video/BV1mU4y1j72n/?p=5&spm_id_from=pageDriver&vd_source=054bcf480436b1c4a589dd66453c235a">发布博客到互联网_哔哩哔哩_bilibili</a></p>
+<h3 id="视频笔记"><a href="#视频笔记" class="headerlink" title="视频笔记"></a>视频笔记</h3><p><a href="https://www.bilibili.com/h5/note-app/view?cvid=14840804&pagefrom=comment">笔记详情 (bilibili.com)</a></p>
+<h3 id="报错解决"><a href="#报错解决" class="headerlink" title="报错解决"></a>报错解决</h3><p><a href="https://blog.csdn.net/qq_45685435/article/details/119863595">git报错:fatal: unable to auto-detect email address，我试错10多遍，我太难了_少年，又是你的博客-CSDN博客</a></p>
+<h3 id="配置及详细使用"><a href="#配置及详细使用" class="headerlink" title="配置及详细使用"></a>配置及详细使用</h3><p><a href="https://www.bilibili.com/video/BV1444y1179K/?spm_id_from=pageDriver&vd_source=054bcf480436b1c4a589dd66453c235a">使用Hexo搭建个人博客手摸手教学(6)|配置文件说明及常用命令_哔哩哔哩_bilibili</a></p>
+<p><a href="https://blog.csdn.net/qq_38140292/article/details/119076400">【hexo】基础教程-一-撰写文章_指尖听戏的博客-CSDN博客_hexo博客怎么写文章</a></p>
+<h3 id="显示图片"><a href="#显示图片" class="headerlink" title="显示图片"></a>显示图片</h3><p>参考：<br><a href="https://oldgerman.github.io/eeea93b8/">https://oldgerman.github.io/eeea93b8/</a><br>安装<br>npm install <a href="https://github.com/CodeFalling/hexo-asset-image">https://github.com/CodeFalling/hexo-asset-image</a> –save</p>
 ]]></content>
-      <categories>
-        <category>R</category>
-      </categories>
       <tags>
-        <tag>adv-R</tag>
+        <tag>博客教程</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2022/09/25/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
   </entry>
   <entry>
     <title>glue学习</title>
@@ -490,39 +523,6 @@ lapply(list(1:3, 4:5), `+`, 100)
       <tags>
         <tag>R</tag>
         <tag>tidy</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2022/09/25/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>hexo教程</title>
-    <url>/2022/09/25/hexo%E6%95%99%E7%A8%8B/</url>
-    <content><![CDATA[<h1 id="githubio-hexo-使用"><a href="#githubio-hexo-使用" class="headerlink" title="githubio_hexo_使用"></a>githubio_hexo_使用</h1><p><code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</code></p>
-<h3 id="参考视频"><a href="#参考视频" class="headerlink" title="参考视频"></a>参考视频</h3><p><a href="https://www.bilibili.com/video/BV1mU4y1j72n/?p=5&spm_id_from=pageDriver&vd_source=054bcf480436b1c4a589dd66453c235a">发布博客到互联网_哔哩哔哩_bilibili</a></p>
-<h3 id="视频笔记"><a href="#视频笔记" class="headerlink" title="视频笔记"></a>视频笔记</h3><p><a href="https://www.bilibili.com/h5/note-app/view?cvid=14840804&pagefrom=comment">笔记详情 (bilibili.com)</a></p>
-<h3 id="报错解决"><a href="#报错解决" class="headerlink" title="报错解决"></a>报错解决</h3><p><a href="https://blog.csdn.net/qq_45685435/article/details/119863595">git报错:fatal: unable to auto-detect email address，我试错10多遍，我太难了_少年，又是你的博客-CSDN博客</a></p>
-<h3 id="配置及详细使用"><a href="#配置及详细使用" class="headerlink" title="配置及详细使用"></a>配置及详细使用</h3><p><a href="https://www.bilibili.com/video/BV1444y1179K/?spm_id_from=pageDriver&vd_source=054bcf480436b1c4a589dd66453c235a">使用Hexo搭建个人博客手摸手教学(6)|配置文件说明及常用命令_哔哩哔哩_bilibili</a></p>
-<p><a href="https://blog.csdn.net/qq_38140292/article/details/119076400">【hexo】基础教程-一-撰写文章_指尖听戏的博客-CSDN博客_hexo博客怎么写文章</a></p>
-<h3 id="显示图片"><a href="#显示图片" class="headerlink" title="显示图片"></a>显示图片</h3><p>参考：<br><a href="https://oldgerman.github.io/eeea93b8/">https://oldgerman.github.io/eeea93b8/</a><br>安装<br>npm install <a href="https://github.com/CodeFalling/hexo-asset-image">https://github.com/CodeFalling/hexo-asset-image</a> –save</p>
-]]></content>
-      <tags>
-        <tag>博客教程</tag>
       </tags>
   </entry>
   <entry>
