@@ -149,73 +149,6 @@
       </tags>
   </entry>
   <entry>
-    <title>efficient R programming</title>
-    <url>/2022/10/06/efficient%20R%20programming%20%E7%AC%94%E8%AE%B0/</url>
-    <content><![CDATA[<h2 id><a href="#" class="headerlink" title></a></h2><h2 id="书本网址："><a href="#书本网址：" class="headerlink" title="书本网址："></a>书本网址：</h2><p><a href="https://csgillespie.github.io/efficientR/programming.html#ref-Wickham2014">3 Efficient programming | Efficient R programming (csgillespie.github.io)</a></p>
-<h2 id="3-Efficient-programming"><a href="#3-Efficient-programming" class="headerlink" title="3 Efficient programming"></a>3 Efficient programming</h2><h3 id="try的使用"><a href="#try的使用" class="headerlink" title="try的使用"></a>try的使用</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">good <span class="operator">=</span> try<span class="punctuation">(</span><span class="number">1</span> <span class="operator">+</span> <span class="number">1</span><span class="punctuation">,</span> silent <span class="operator">=</span> <span class="literal">TRUE</span><span class="punctuation">)</span></span><br><span class="line">bad <span class="operator">=</span> try<span class="punctuation">(</span><span class="number">1</span> <span class="operator">+</span> <span class="string">&quot;1&quot;</span><span class="punctuation">,</span> silent <span class="operator">=</span> <span class="literal">TRUE</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">good</span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; [1] 2
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">bad</span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; [1] &quot;Error in 1 + \&quot;1\&quot; : non-numeric argument to binary operator\n&quot;
-#&gt; attr(,&quot;class&quot;)
-#&gt; [1] &quot;try-error&quot;
-#&gt; attr(,&quot;condition&quot;)
-#&gt; &lt;simpleError in 1 + &quot;1&quot;: non-numeric argument to binary operator&gt;
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="built_in">class</span><span class="punctuation">(</span>bad<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; [1] &quot;try-error&quot;
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="built_in">class</span><span class="punctuation">(</span>bad<span class="punctuation">)</span> <span class="operator">==</span> <span class="string">&quot;try-error&quot;</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; [1] TRUE
-</code></pre>
-<p>try遇到error 返回 try-error 类型，所以可以根据这个判断执行什么操作</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="punctuation">(</span><span class="built_in">class</span><span class="punctuation">(</span>bad<span class="punctuation">)</span> <span class="operator">==</span> <span class="string">&quot;try-error&quot;</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  </span><br><span class="line">  <span class="comment"># do something</span></span><br><span class="line">  </span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; NULL
-</code></pre>
-<h3 id="Invisible-返回不可见的return"><a href="#Invisible-返回不可见的return" class="headerlink" title="Invisible 返回不可见的return"></a>Invisible 返回不可见的return</h3><p>运行函数没有赋值时，会把return的内容打印的屏幕，有时候内容较多，且我们不需要赋值时，可以</p>
-<p>通过 Invisible 返回内容但不打印出来</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  s <span class="operator">&lt;-</span> 1<span class="operator">:</span><span class="number">10</span></span><br><span class="line">  <span class="built_in">return</span><span class="punctuation">(</span>s<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">f<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt;  [1]  1  2  3  4  5  6  7  8  9 10
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f2 <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  s <span class="operator">&lt;-</span> 1<span class="operator">:</span><span class="number">10</span></span><br><span class="line">  <span class="built_in">invisible</span><span class="punctuation">(</span>s<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">f2<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f2_return <span class="operator">&lt;-</span> f2<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">f2_return</span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt;  [1]  1  2  3  4  5  6  7  8  9 10
-</code></pre>
-<h3 id="Function-closures-函数闭包"><a href="#Function-closures-函数闭包" class="headerlink" title="Function closures 函数闭包"></a>Function closures 函数闭包</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># &lt;&lt;- assigns values to the parent environment</span></span><br><span class="line">stop_watch <span class="operator">=</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  start_time <span class="operator">=</span> stop_time <span class="operator">=</span> <span class="literal">NULL</span></span><br><span class="line">  start <span class="operator">=</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> start_time <span class="operator">&lt;&lt;-</span> Sys.time<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">  stop <span class="operator">=</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    stop_time <span class="operator">&lt;&lt;-</span> Sys.time<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">    difftime<span class="punctuation">(</span>stop_time<span class="punctuation">,</span> start_time<span class="punctuation">)</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="built_in">list</span><span class="punctuation">(</span>start <span class="operator">=</span> start<span class="punctuation">,</span> stop <span class="operator">=</span> stop<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">watch <span class="operator">=</span> stop_watch<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">watch</span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; $start
-#&gt; function() start_time &lt;&lt;- Sys.time()
-#&gt; &lt;environment: 0x000001f1d739f7f8&gt;
-#&gt; 
-#&gt; $stop
-#&gt; function() &#123;
-#&gt;     stop_time &lt;&lt;- Sys.time()
-#&gt;     difftime(stop_time, start_time)
-#&gt;   &#125;
-#&gt; &lt;environment: 0x000001f1d739f7f8&gt;
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">watch<span class="operator">$</span>start<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">watch<span class="operator">$</span>stop<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Time difference of 0.0009000301 secs
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># 意思是 counter 函数最后返回的的 iplus 函数 </span></span><br><span class="line">counter <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">   i <span class="operator">&lt;-</span> 0</span><br><span class="line">   iplus <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">      i <span class="operator">&lt;&lt;-</span> i<span class="operator">+</span><span class="number">1</span></span><br><span class="line">      i </span><br><span class="line">   <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="comment"># 注意 没有（）括号 fanhui</span></span><br><span class="line">    iplus</span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 这里相当于把 iplus 函数 传递给了c1</span></span><br><span class="line">c1 <span class="operator">&lt;-</span>counter<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">c1</span><br><span class="line"><span class="comment">#&gt; function()&#123;</span></span><br><span class="line"><span class="comment">#&gt;       i &lt;&lt;- i+1</span></span><br><span class="line"><span class="comment">#&gt;       i </span></span><br><span class="line"><span class="comment">#&gt;    &#125;</span></span><br><span class="line"><span class="comment">#&gt; &lt;environment: 0x000001f1d920fa30&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># c1的环境在 counter里 i &lt;&lt;- i+1 把i放到了counter的环境里</span></span><br><span class="line">environment<span class="punctuation">(</span>c1<span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; &lt;environment: 0x000001f1d920fa30&gt;</span></span><br><span class="line"></span><br><span class="line">environment<span class="punctuation">(</span>counter<span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; &lt;environment: R_GlobalEnv&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行c1() 就是相当于 运行了 iplus 函数 </span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 1</span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 2</span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 3</span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 4</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>R</category>
-      </categories>
-      <tags>
-        <tag>R note</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>adv-6functions</title>
     <url>/2022/10/09/adv-6functions/</url>
     <content><![CDATA[<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>b<span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  </span><br><span class="line">  <span class="comment"># AAA</span></span><br><span class="line">  a <span class="operator">=</span> b</span><br><span class="line">  </span><br><span class="line">  print<span class="punctuation">(</span>a<span class="punctuation">)</span></span><br><span class="line">  </span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
@@ -383,6 +316,73 @@ lapply(list(1:3, 4:5), `+`, 100)
       </tags>
   </entry>
   <entry>
+    <title>efficient R programming</title>
+    <url>/2022/10/06/efficient%20R%20programming%20%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<h2 id><a href="#" class="headerlink" title></a></h2><h2 id="书本网址："><a href="#书本网址：" class="headerlink" title="书本网址："></a>书本网址：</h2><p><a href="https://csgillespie.github.io/efficientR/programming.html#ref-Wickham2014">3 Efficient programming | Efficient R programming (csgillespie.github.io)</a></p>
+<h2 id="3-Efficient-programming"><a href="#3-Efficient-programming" class="headerlink" title="3 Efficient programming"></a>3 Efficient programming</h2><h3 id="try的使用"><a href="#try的使用" class="headerlink" title="try的使用"></a>try的使用</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">good <span class="operator">=</span> try<span class="punctuation">(</span><span class="number">1</span> <span class="operator">+</span> <span class="number">1</span><span class="punctuation">,</span> silent <span class="operator">=</span> <span class="literal">TRUE</span><span class="punctuation">)</span></span><br><span class="line">bad <span class="operator">=</span> try<span class="punctuation">(</span><span class="number">1</span> <span class="operator">+</span> <span class="string">&quot;1&quot;</span><span class="punctuation">,</span> silent <span class="operator">=</span> <span class="literal">TRUE</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">good</span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; [1] 2
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">bad</span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; [1] &quot;Error in 1 + \&quot;1\&quot; : non-numeric argument to binary operator\n&quot;
+#&gt; attr(,&quot;class&quot;)
+#&gt; [1] &quot;try-error&quot;
+#&gt; attr(,&quot;condition&quot;)
+#&gt; &lt;simpleError in 1 + &quot;1&quot;: non-numeric argument to binary operator&gt;
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="built_in">class</span><span class="punctuation">(</span>bad<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; [1] &quot;try-error&quot;
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="built_in">class</span><span class="punctuation">(</span>bad<span class="punctuation">)</span> <span class="operator">==</span> <span class="string">&quot;try-error&quot;</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; [1] TRUE
+</code></pre>
+<p>try遇到error 返回 try-error 类型，所以可以根据这个判断执行什么操作</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="punctuation">(</span><span class="built_in">class</span><span class="punctuation">(</span>bad<span class="punctuation">)</span> <span class="operator">==</span> <span class="string">&quot;try-error&quot;</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  </span><br><span class="line">  <span class="comment"># do something</span></span><br><span class="line">  </span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; NULL
+</code></pre>
+<h3 id="Invisible-返回不可见的return"><a href="#Invisible-返回不可见的return" class="headerlink" title="Invisible 返回不可见的return"></a>Invisible 返回不可见的return</h3><p>运行函数没有赋值时，会把return的内容打印的屏幕，有时候内容较多，且我们不需要赋值时，可以</p>
+<p>通过 Invisible 返回内容但不打印出来</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  s <span class="operator">&lt;-</span> 1<span class="operator">:</span><span class="number">10</span></span><br><span class="line">  <span class="built_in">return</span><span class="punctuation">(</span>s<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">f<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt;  [1]  1  2  3  4  5  6  7  8  9 10
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f2 <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  s <span class="operator">&lt;-</span> 1<span class="operator">:</span><span class="number">10</span></span><br><span class="line">  <span class="built_in">invisible</span><span class="punctuation">(</span>s<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">f2<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f2_return <span class="operator">&lt;-</span> f2<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">f2_return</span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt;  [1]  1  2  3  4  5  6  7  8  9 10
+</code></pre>
+<h3 id="Function-closures-函数闭包"><a href="#Function-closures-函数闭包" class="headerlink" title="Function closures 函数闭包"></a>Function closures 函数闭包</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># &lt;&lt;- assigns values to the parent environment</span></span><br><span class="line">stop_watch <span class="operator">=</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  start_time <span class="operator">=</span> stop_time <span class="operator">=</span> <span class="literal">NULL</span></span><br><span class="line">  start <span class="operator">=</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> start_time <span class="operator">&lt;&lt;-</span> Sys.time<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">  stop <span class="operator">=</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    stop_time <span class="operator">&lt;&lt;-</span> Sys.time<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">    difftime<span class="punctuation">(</span>stop_time<span class="punctuation">,</span> start_time<span class="punctuation">)</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="built_in">list</span><span class="punctuation">(</span>start <span class="operator">=</span> start<span class="punctuation">,</span> stop <span class="operator">=</span> stop<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">watch <span class="operator">=</span> stop_watch<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">watch</span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; $start
+#&gt; function() start_time &lt;&lt;- Sys.time()
+#&gt; &lt;environment: 0x000001f1d739f7f8&gt;
+#&gt; 
+#&gt; $stop
+#&gt; function() &#123;
+#&gt;     stop_time &lt;&lt;- Sys.time()
+#&gt;     difftime(stop_time, start_time)
+#&gt;   &#125;
+#&gt; &lt;environment: 0x000001f1d739f7f8&gt;
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">watch<span class="operator">$</span>start<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">watch<span class="operator">$</span>stop<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Time difference of 0.0009000301 secs
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># 意思是 counter 函数最后返回的的 iplus 函数 </span></span><br><span class="line">counter <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">   i <span class="operator">&lt;-</span> 0</span><br><span class="line">   iplus <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">      i <span class="operator">&lt;&lt;-</span> i<span class="operator">+</span><span class="number">1</span></span><br><span class="line">      i </span><br><span class="line">   <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="comment"># 注意 没有（）括号 fanhui</span></span><br><span class="line">    iplus</span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 这里相当于把 iplus 函数 传递给了c1</span></span><br><span class="line">c1 <span class="operator">&lt;-</span>counter<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">c1</span><br><span class="line"><span class="comment">#&gt; function()&#123;</span></span><br><span class="line"><span class="comment">#&gt;       i &lt;&lt;- i+1</span></span><br><span class="line"><span class="comment">#&gt;       i </span></span><br><span class="line"><span class="comment">#&gt;    &#125;</span></span><br><span class="line"><span class="comment">#&gt; &lt;environment: 0x000001f1d920fa30&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># c1的环境在 counter里 i &lt;&lt;- i+1 把i放到了counter的环境里</span></span><br><span class="line">environment<span class="punctuation">(</span>c1<span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; &lt;environment: 0x000001f1d920fa30&gt;</span></span><br><span class="line"></span><br><span class="line">environment<span class="punctuation">(</span>counter<span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; &lt;environment: R_GlobalEnv&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行c1() 就是相当于 运行了 iplus 函数 </span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 1</span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 2</span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 3</span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 4</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>R</category>
+      </categories>
+      <tags>
+        <tag>R note</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>glue学习</title>
     <url>/2022/09/26/glue/</url>
     <content><![CDATA[<h3 id="glue-处理字符串连接”-变量or表达式-”"><a href="#glue-处理字符串连接”-变量or表达式-”" class="headerlink" title="glue 处理字符串连接”{变量or表达式}”`"></a>glue 处理字符串连接”{变量or表达式}”`</h3><p>glue处理过后的字符串可以通过 + 和其他字符串进行连接，是可以接表达式</p>
@@ -511,21 +511,6 @@ lapply(list(1:3, 4:5), `+`, 100)
 ]]></content>
   </entry>
   <entry>
-    <title>hexo教程</title>
-    <url>/2022/09/25/hexo%E6%95%99%E7%A8%8B/</url>
-    <content><![CDATA[<h1 id="githubio-hexo-使用"><a href="#githubio-hexo-使用" class="headerlink" title="githubio_hexo_使用"></a>githubio_hexo_使用</h1><p><code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</code></p>
-<h3 id="参考视频"><a href="#参考视频" class="headerlink" title="参考视频"></a>参考视频</h3><p><a href="https://www.bilibili.com/video/BV1mU4y1j72n/?p=5&spm_id_from=pageDriver&vd_source=054bcf480436b1c4a589dd66453c235a">发布博客到互联网_哔哩哔哩_bilibili</a></p>
-<h3 id="视频笔记"><a href="#视频笔记" class="headerlink" title="视频笔记"></a>视频笔记</h3><p><a href="https://www.bilibili.com/h5/note-app/view?cvid=14840804&pagefrom=comment">笔记详情 (bilibili.com)</a></p>
-<h3 id="报错解决"><a href="#报错解决" class="headerlink" title="报错解决"></a>报错解决</h3><p><a href="https://blog.csdn.net/qq_45685435/article/details/119863595">git报错:fatal: unable to auto-detect email address，我试错10多遍，我太难了_少年，又是你的博客-CSDN博客</a></p>
-<h3 id="配置及详细使用"><a href="#配置及详细使用" class="headerlink" title="配置及详细使用"></a>配置及详细使用</h3><p><a href="https://www.bilibili.com/video/BV1444y1179K/?spm_id_from=pageDriver&vd_source=054bcf480436b1c4a589dd66453c235a">使用Hexo搭建个人博客手摸手教学(6)|配置文件说明及常用命令_哔哩哔哩_bilibili</a></p>
-<p><a href="https://blog.csdn.net/qq_38140292/article/details/119076400">【hexo】基础教程-一-撰写文章_指尖听戏的博客-CSDN博客_hexo博客怎么写文章</a></p>
-<h3 id="显示图片"><a href="#显示图片" class="headerlink" title="显示图片"></a>显示图片</h3><p>参考：<br><a href="https://oldgerman.github.io/eeea93b8/">https://oldgerman.github.io/eeea93b8/</a><br>安装<br>npm install <a href="https://github.com/CodeFalling/hexo-asset-image">https://github.com/CodeFalling/hexo-asset-image</a> –save</p>
-]]></content>
-      <tags>
-        <tag>博客教程</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>quarto使用笔记</title>
     <url>/2022/10/03/quarto%E7%AC%94%E8%AE%B0/</url>
     <content><![CDATA[<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ul>
@@ -570,6 +555,21 @@ lapply(list(1:3, 4:5), `+`, 100)
     <url>/2022/10/10/test2/</url>
     <content><![CDATA[<h3 id="图片"><a href="#图片" class="headerlink" title="图片"></a>图片</h3><p><img src="/2022/10/10/test2/aa/image-20221010110318884.png" alt="image-20221010110318884"></p>
 ]]></content>
+  </entry>
+  <entry>
+    <title>hexo教程</title>
+    <url>/2022/09/25/hexo%E6%95%99%E7%A8%8B/</url>
+    <content><![CDATA[<h1 id="githubio-hexo-使用"><a href="#githubio-hexo-使用" class="headerlink" title="githubio_hexo_使用"></a>githubio_hexo_使用</h1><p><code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</code></p>
+<h3 id="参考视频"><a href="#参考视频" class="headerlink" title="参考视频"></a>参考视频</h3><p><a href="https://www.bilibili.com/video/BV1mU4y1j72n/?p=5&spm_id_from=pageDriver&vd_source=054bcf480436b1c4a589dd66453c235a">发布博客到互联网_哔哩哔哩_bilibili</a></p>
+<h3 id="视频笔记"><a href="#视频笔记" class="headerlink" title="视频笔记"></a>视频笔记</h3><p><a href="https://www.bilibili.com/h5/note-app/view?cvid=14840804&pagefrom=comment">笔记详情 (bilibili.com)</a></p>
+<h3 id="报错解决"><a href="#报错解决" class="headerlink" title="报错解决"></a>报错解决</h3><p><a href="https://blog.csdn.net/qq_45685435/article/details/119863595">git报错:fatal: unable to auto-detect email address，我试错10多遍，我太难了_少年，又是你的博客-CSDN博客</a></p>
+<h3 id="配置及详细使用"><a href="#配置及详细使用" class="headerlink" title="配置及详细使用"></a>配置及详细使用</h3><p><a href="https://www.bilibili.com/video/BV1444y1179K/?spm_id_from=pageDriver&vd_source=054bcf480436b1c4a589dd66453c235a">使用Hexo搭建个人博客手摸手教学(6)|配置文件说明及常用命令_哔哩哔哩_bilibili</a></p>
+<p><a href="https://blog.csdn.net/qq_38140292/article/details/119076400">【hexo】基础教程-一-撰写文章_指尖听戏的博客-CSDN博客_hexo博客怎么写文章</a></p>
+<h3 id="显示图片"><a href="#显示图片" class="headerlink" title="显示图片"></a>显示图片</h3><p>参考：<br><a href="https://oldgerman.github.io/eeea93b8/">https://oldgerman.github.io/eeea93b8/</a><br>安装<br>npm install <a href="https://github.com/CodeFalling/hexo-asset-image">https://github.com/CodeFalling/hexo-asset-image</a> –save</p>
+]]></content>
+      <tags>
+        <tag>博客教程</tag>
+      </tags>
   </entry>
   <entry>
     <title>使用scale_fill* 超出指定范围的值设定为NA的颜色</title>
