@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Biomart对基因进行注释</title>
+    <url>/2022/09/25/Biomart%E5%AF%B9%E5%9F%BA%E5%9B%A0%E8%BF%9B%E8%A1%8C%E6%B3%A8%E9%87%8A/</url>
+    <content><![CDATA[<h3 id="对植物"><a href="#对植物" class="headerlink" title="对植物"></a>对植物</h3><p>mart要指定为plants_mart</p>
+<p>dataset指定物种数据库的名称</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">ensembl <span class="operator">=</span> useMart<span class="punctuation">(</span>biomart <span class="operator">=</span> <span class="string">&quot;plants_mart&quot;</span><span class="punctuation">,</span>host <span class="operator">=</span> <span class="string">&quot;http://plants.ensembl.org&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 列出可选择的植物</span></span><br><span class="line">listDatasets<span class="punctuation">(</span>ensembl<span class="punctuation">)</span>  </span><br><span class="line"></span><br><span class="line">ensembl <span class="operator">=</span> useMart<span class="punctuation">(</span>biomart <span class="operator">=</span> <span class="string">&quot;plants_mart&quot;</span><span class="punctuation">,</span>host <span class="operator">=</span> <span class="string">&quot;http://plants.ensembl.org&quot;</span><span class="punctuation">,</span>dataset<span class="operator">=</span><span class="string">&quot;sitalica_eg_gene&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">gene <span class="operator">&lt;-</span> read.table<span class="punctuation">(</span><span class="string">&quot;./128个基因.txt&quot;</span><span class="punctuation">)</span></span><br><span class="line">gene <span class="operator">&lt;-</span> gene<span class="operator">$</span>V1</span><br><span class="line"></span><br><span class="line">listAttributes<span class="punctuation">(</span>ensembl<span class="punctuation">)</span> <span class="operator">%&gt;%</span> View<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">gene_anno <span class="operator">&lt;-</span> getBM<span class="punctuation">(</span><span class="built_in">attributes</span><span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="string">&quot;ensembl_gene_id&quot;</span><span class="punctuation">,</span> <span class="string">&quot;gene_biotype&quot;</span><span class="punctuation">,</span></span><br><span class="line">                                 <span class="string">&quot;chromosome_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;start_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;end_position&quot;</span><span class="punctuation">,</span></span><br><span class="line">                                 <span class="string">&quot;strand&quot;</span><span class="punctuation">,</span><span class="string">&quot;description&quot;</span><span class="punctuation">,</span><span class="string">&quot;ensembl_peptide_id&quot;</span><span class="punctuation">,</span><span class="string">&quot;peptide&quot;</span><span class="punctuation">)</span><span class="punctuation">,</span> </span><br><span class="line">                    filters<span class="operator">=</span> <span class="string">&#x27;ensembl_gene_id&#x27;</span><span class="punctuation">,</span> value <span class="operator">=</span>gene<span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p><code>listAttributes(ensembl) %&gt;% View()</code></p>
+<p>列出可以添加的信息</p>
+<p><img src="/2022/09/25/Biomart%E5%AF%B9%E5%9F%BA%E5%9B%A0%E8%BF%9B%E8%A1%8C%E6%B3%A8%E9%87%8A/image-20220925204715975.png" alt="image-20220925204715975"></p>
+<h3 id="对动物"><a href="#对动物" class="headerlink" title="对动物"></a>对动物</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">listEnsembl<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">ensembl <span class="operator">&lt;-</span> useEnsembl<span class="punctuation">(</span>biomart <span class="operator">=</span> <span class="string">&quot;genes&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">listDatasets<span class="punctuation">(</span>ensembl<span class="punctuation">)</span></span><br><span class="line">ensembl <span class="operator">&lt;-</span> useDataset<span class="punctuation">(</span>dataset <span class="operator">=</span> <span class="string">&quot;mmusculus_gene_ensembl&quot;</span><span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">listAttributes<span class="punctuation">(</span>ensembl<span class="punctuation">)</span> <span class="operator">%&gt;%</span> View<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">martsymbol <span class="operator">&lt;-</span> getBM<span class="punctuation">(</span><span class="built_in">attributes</span><span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="string">&quot;ensembl_gene_id&quot;</span><span class="punctuation">,</span> <span class="string">&quot;external_gene_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;gene_biotype&quot;</span><span class="punctuation">,</span></span><br><span class="line">                                 <span class="string">&quot;chromosome_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;start_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;end_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;strand&quot;</span><span class="punctuation">,</span><span class="string">&quot;description&quot;</span><span class="punctuation">)</span><span class="punctuation">,</span> </span><br><span class="line">                    filters<span class="operator">=</span> <span class="string">&#x27;ensembl_gene_id&#x27;</span><span class="punctuation">,</span> value <span class="operator">=</span>diff_gene<span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>BioMart</tag>
+        <tag>gene annotate</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>R tip</title>
     <url>/2022/10/10/R-tip%E8%AE%B0%E5%BD%95/</url>
     <content><![CDATA[<h2 id="2022-10-09"><a href="#2022-10-09" class="headerlink" title="2022-10-09"></a>2022-10-09</h2><h3 id="解析字符串为表达式并运行"><a href="#解析字符串为表达式并运行" class="headerlink" title="解析字符串为表达式并运行"></a>解析字符串为表达式并运行</h3><p>parse把文本变成表达式 expression</p>
@@ -65,87 +85,6 @@
       </categories>
       <tags>
         <tag>R tip</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Biomart对基因进行注释</title>
-    <url>/2022/09/25/Biomart%E5%AF%B9%E5%9F%BA%E5%9B%A0%E8%BF%9B%E8%A1%8C%E6%B3%A8%E9%87%8A/</url>
-    <content><![CDATA[<h3 id="对植物"><a href="#对植物" class="headerlink" title="对植物"></a>对植物</h3><p>mart要指定为plants_mart</p>
-<p>dataset指定物种数据库的名称</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">ensembl <span class="operator">=</span> useMart<span class="punctuation">(</span>biomart <span class="operator">=</span> <span class="string">&quot;plants_mart&quot;</span><span class="punctuation">,</span>host <span class="operator">=</span> <span class="string">&quot;http://plants.ensembl.org&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 列出可选择的植物</span></span><br><span class="line">listDatasets<span class="punctuation">(</span>ensembl<span class="punctuation">)</span>  </span><br><span class="line"></span><br><span class="line">ensembl <span class="operator">=</span> useMart<span class="punctuation">(</span>biomart <span class="operator">=</span> <span class="string">&quot;plants_mart&quot;</span><span class="punctuation">,</span>host <span class="operator">=</span> <span class="string">&quot;http://plants.ensembl.org&quot;</span><span class="punctuation">,</span>dataset<span class="operator">=</span><span class="string">&quot;sitalica_eg_gene&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">gene <span class="operator">&lt;-</span> read.table<span class="punctuation">(</span><span class="string">&quot;./128个基因.txt&quot;</span><span class="punctuation">)</span></span><br><span class="line">gene <span class="operator">&lt;-</span> gene<span class="operator">$</span>V1</span><br><span class="line"></span><br><span class="line">listAttributes<span class="punctuation">(</span>ensembl<span class="punctuation">)</span> <span class="operator">%&gt;%</span> View<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">gene_anno <span class="operator">&lt;-</span> getBM<span class="punctuation">(</span><span class="built_in">attributes</span><span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="string">&quot;ensembl_gene_id&quot;</span><span class="punctuation">,</span> <span class="string">&quot;gene_biotype&quot;</span><span class="punctuation">,</span></span><br><span class="line">                                 <span class="string">&quot;chromosome_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;start_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;end_position&quot;</span><span class="punctuation">,</span></span><br><span class="line">                                 <span class="string">&quot;strand&quot;</span><span class="punctuation">,</span><span class="string">&quot;description&quot;</span><span class="punctuation">,</span><span class="string">&quot;ensembl_peptide_id&quot;</span><span class="punctuation">,</span><span class="string">&quot;peptide&quot;</span><span class="punctuation">)</span><span class="punctuation">,</span> </span><br><span class="line">                    filters<span class="operator">=</span> <span class="string">&#x27;ensembl_gene_id&#x27;</span><span class="punctuation">,</span> value <span class="operator">=</span>gene<span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-<p><code>listAttributes(ensembl) %&gt;% View()</code></p>
-<p>列出可以添加的信息</p>
-<p><img src="/2022/09/25/Biomart%E5%AF%B9%E5%9F%BA%E5%9B%A0%E8%BF%9B%E8%A1%8C%E6%B3%A8%E9%87%8A/image-20220925204715975.png" alt="image-20220925204715975"></p>
-<h3 id="对动物"><a href="#对动物" class="headerlink" title="对动物"></a>对动物</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">listEnsembl<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">ensembl <span class="operator">&lt;-</span> useEnsembl<span class="punctuation">(</span>biomart <span class="operator">=</span> <span class="string">&quot;genes&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">listDatasets<span class="punctuation">(</span>ensembl<span class="punctuation">)</span></span><br><span class="line">ensembl <span class="operator">&lt;-</span> useDataset<span class="punctuation">(</span>dataset <span class="operator">=</span> <span class="string">&quot;mmusculus_gene_ensembl&quot;</span><span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">listAttributes<span class="punctuation">(</span>ensembl<span class="punctuation">)</span> <span class="operator">%&gt;%</span> View<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">martsymbol <span class="operator">&lt;-</span> getBM<span class="punctuation">(</span><span class="built_in">attributes</span><span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="string">&quot;ensembl_gene_id&quot;</span><span class="punctuation">,</span> <span class="string">&quot;external_gene_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;gene_biotype&quot;</span><span class="punctuation">,</span></span><br><span class="line">                                 <span class="string">&quot;chromosome_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;start_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;end_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;strand&quot;</span><span class="punctuation">,</span><span class="string">&quot;description&quot;</span><span class="punctuation">)</span><span class="punctuation">,</span> </span><br><span class="line">                    filters<span class="operator">=</span> <span class="string">&#x27;ensembl_gene_id&#x27;</span><span class="punctuation">,</span> value <span class="operator">=</span>diff_gene<span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <tags>
-        <tag>BioMart</tag>
-        <tag>gene annotate</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>adv-R_22debug</title>
-    <url>/2022/10/06/adv-R_22debu/</url>
-    <content><![CDATA[<h3 id="Locating-errors"><a href="#Locating-errors" class="headerlink" title="Locating errors"></a><strong>Locating errors</strong></h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>a<span class="punctuation">)</span> g<span class="punctuation">(</span>a<span class="punctuation">)</span></span><br><span class="line">g <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>b<span class="punctuation">)</span> h<span class="punctuation">(</span>b<span class="punctuation">)</span></span><br><span class="line">h <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="built_in">c</span><span class="punctuation">)</span> i<span class="punctuation">(</span><span class="built_in">c</span><span class="punctuation">)</span></span><br><span class="line">i <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>d<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  <span class="keyword">if</span> <span class="punctuation">(</span><span class="operator">!</span><span class="built_in">is.numeric</span><span class="punctuation">(</span>d<span class="punctuation">)</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    stop<span class="punctuation">(</span><span class="string">&quot;`d` must be numeric&quot;</span><span class="punctuation">,</span> call. <span class="operator">=</span> <span class="literal">FALSE</span><span class="punctuation">)</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line">  d <span class="operator">+</span> <span class="number">10</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line">f<span class="punctuation">(</span><span class="string">&quot;a&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error: `d` must be numeric
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 点击报错右边的 Show Trackback 定位报错位置</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 或者 用过 traceback() 函数 </span></span><br><span class="line">traceback<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; No traceback available
-</code></pre>
-<h3 id="涉及-lazy-evaluation-使用-rlang-last-trace-rlang-abort"><a href="#涉及-lazy-evaluation-使用-rlang-last-trace-rlang-abort" class="headerlink" title="涉及 lazy evaluation 使用 rlang::last_trace() rlang::abort()"></a>涉及 lazy evaluation 使用 rlang::last_trace() rlang::abort()</h3><p>Traceback ()的一个缺点是它总是线性化调用树，如果涉及大量的惰性计算，这可能会造成混淆</p>
-<p>使用 rlang: : with _ abort ()和 rlang: : last _ trace ()查看调用树。在这里，我认为这让我们更容易看到问题的根源</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># j函数调用k函数 k函数返回stop</span></span><br><span class="line">j <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> k<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">k <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> stop<span class="punctuation">(</span><span class="string">&quot;Oops!&quot;</span><span class="punctuation">,</span> call. <span class="operator">=</span> <span class="literal">FALSE</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">j<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error: Oops!
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f<span class="punctuation">(</span>j<span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error: Oops!
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">traceback<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; No traceback available
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">rlang<span class="operator">::</span>abort<span class="punctuation">(</span>f<span class="punctuation">(</span>j<span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error: Oops!
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">rlang<span class="operator">::</span>last_trace<span class="punctuation">(</span>f<span class="punctuation">(</span>j<span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error: Can&#39;t show last error because no error was recorded yet
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="number">1</span><span class="operator">+</span>a</span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error in eval(expr, envir, enclos): object &#39;a&#39; not found
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">rlang<span class="operator">::</span>last_trace<span class="punctuation">(</span><span class="number">1</span><span class="operator">+</span>a<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error: Can&#39;t show last error because no error was recorded yet
-</code></pre>
-<h3 id="Interactive-debugger"><a href="#Interactive-debugger" class="headerlink" title="Interactive debugger"></a><strong>Interactive debugger</strong></h3><p>函数报错 则在函数内部插入 browser() 运行到 browser()便出现互交的调试界面</p>
-<p>跟pycharm一样方便的调试</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">g <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>b<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  <span class="built_in">browser</span><span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">  h<span class="punctuation">(</span>b<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">f<span class="punctuation">(</span><span class="number">10</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Called from: g(a)
-#&gt; debug at &lt;text&gt;#3: h(b)
-
-#&gt; [1] 20
-</code></pre>
-<h4 id><a href="#" class="headerlink" title></a></h4><p><strong>Breakpoints</strong><br>可以通过单击行号左侧或按 Shift + F9来设置断点。断点的行为类似于浏览器() ，但它们更容易设置(单击一次而不是按9次键) ，并且不会冒险在源代码中意外包含一个浏览器()语句。断点有两个小小的缺点:</p>
-]]></content>
-      <categories>
-        <category>R</category>
-      </categories>
-      <tags>
-        <tag>adv-R</tag>
       </tags>
   </entry>
   <entry>
@@ -316,89 +255,65 @@ lapply(list(1:3, 4:5), `+`, 100)
       </tags>
   </entry>
   <entry>
-    <title>efficient R programming</title>
-    <url>/2022/10/06/efficient%20R%20programming%20%E7%AC%94%E8%AE%B0/</url>
-    <content><![CDATA[<h2 id><a href="#" class="headerlink" title></a></h2><h2 id="书本网址："><a href="#书本网址：" class="headerlink" title="书本网址："></a>书本网址：</h2><p><a href="https://csgillespie.github.io/efficientR/programming.html#ref-Wickham2014">3 Efficient programming | Efficient R programming (csgillespie.github.io)</a></p>
-<h2 id="3-Efficient-programming"><a href="#3-Efficient-programming" class="headerlink" title="3 Efficient programming"></a>3 Efficient programming</h2><h3 id="try的使用"><a href="#try的使用" class="headerlink" title="try的使用"></a>try的使用</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">good <span class="operator">=</span> try<span class="punctuation">(</span><span class="number">1</span> <span class="operator">+</span> <span class="number">1</span><span class="punctuation">,</span> silent <span class="operator">=</span> <span class="literal">TRUE</span><span class="punctuation">)</span></span><br><span class="line">bad <span class="operator">=</span> try<span class="punctuation">(</span><span class="number">1</span> <span class="operator">+</span> <span class="string">&quot;1&quot;</span><span class="punctuation">,</span> silent <span class="operator">=</span> <span class="literal">TRUE</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">good</span><br></pre></td></tr></table></figure>
+    <title>adv-R_22debug</title>
+    <url>/2022/10/06/adv-R_22debu/</url>
+    <content><![CDATA[<h3 id="Locating-errors"><a href="#Locating-errors" class="headerlink" title="Locating errors"></a><strong>Locating errors</strong></h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>a<span class="punctuation">)</span> g<span class="punctuation">(</span>a<span class="punctuation">)</span></span><br><span class="line">g <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>b<span class="punctuation">)</span> h<span class="punctuation">(</span>b<span class="punctuation">)</span></span><br><span class="line">h <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="built_in">c</span><span class="punctuation">)</span> i<span class="punctuation">(</span><span class="built_in">c</span><span class="punctuation">)</span></span><br><span class="line">i <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>d<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  <span class="keyword">if</span> <span class="punctuation">(</span><span class="operator">!</span><span class="built_in">is.numeric</span><span class="punctuation">(</span>d<span class="punctuation">)</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    stop<span class="punctuation">(</span><span class="string">&quot;`d` must be numeric&quot;</span><span class="punctuation">,</span> call. <span class="operator">=</span> <span class="literal">FALSE</span><span class="punctuation">)</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line">  d <span class="operator">+</span> <span class="number">10</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line">f<span class="punctuation">(</span><span class="string">&quot;a&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
-<pre><code>#&gt; [1] 2
+<pre><code>#&gt; Error: `d` must be numeric
 </code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">bad</span><br></pre></td></tr></table></figure>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 点击报错右边的 Show Trackback 定位报错位置</span></span><br></pre></td></tr></table></figure>
 
-<pre><code>#&gt; [1] &quot;Error in 1 + \&quot;1\&quot; : non-numeric argument to binary operator\n&quot;
-#&gt; attr(,&quot;class&quot;)
-#&gt; [1] &quot;try-error&quot;
-#&gt; attr(,&quot;condition&quot;)
-#&gt; &lt;simpleError in 1 + &quot;1&quot;: non-numeric argument to binary operator&gt;
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 或者 用过 traceback() 函数 </span></span><br><span class="line">traceback<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; No traceback available
 </code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="built_in">class</span><span class="punctuation">(</span>bad<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+<h3 id="涉及-lazy-evaluation-使用-rlang-last-trace-rlang-abort"><a href="#涉及-lazy-evaluation-使用-rlang-last-trace-rlang-abort" class="headerlink" title="涉及 lazy evaluation 使用 rlang::last_trace() rlang::abort()"></a>涉及 lazy evaluation 使用 rlang::last_trace() rlang::abort()</h3><p>Traceback ()的一个缺点是它总是线性化调用树，如果涉及大量的惰性计算，这可能会造成混淆</p>
+<p>使用 rlang: : with _ abort ()和 rlang: : last _ trace ()查看调用树。在这里，我认为这让我们更容易看到问题的根源</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># j函数调用k函数 k函数返回stop</span></span><br><span class="line">j <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> k<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">k <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> stop<span class="punctuation">(</span><span class="string">&quot;Oops!&quot;</span><span class="punctuation">,</span> call. <span class="operator">=</span> <span class="literal">FALSE</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">j<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
-<pre><code>#&gt; [1] &quot;try-error&quot;
+<pre><code>#&gt; Error: Oops!
 </code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="built_in">class</span><span class="punctuation">(</span>bad<span class="punctuation">)</span> <span class="operator">==</span> <span class="string">&quot;try-error&quot;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f<span class="punctuation">(</span>j<span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
-<pre><code>#&gt; [1] TRUE
+<pre><code>#&gt; Error: Oops!
 </code></pre>
-<p>try遇到error 返回 try-error 类型，所以可以根据这个判断执行什么操作</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="punctuation">(</span><span class="built_in">class</span><span class="punctuation">(</span>bad<span class="punctuation">)</span> <span class="operator">==</span> <span class="string">&quot;try-error&quot;</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  </span><br><span class="line">  <span class="comment"># do something</span></span><br><span class="line">  </span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">traceback<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
-<pre><code>#&gt; NULL
+<pre><code>#&gt; No traceback available
 </code></pre>
-<h3 id="Invisible-返回不可见的return"><a href="#Invisible-返回不可见的return" class="headerlink" title="Invisible 返回不可见的return"></a>Invisible 返回不可见的return</h3><p>运行函数没有赋值时，会把return的内容打印的屏幕，有时候内容较多，且我们不需要赋值时，可以</p>
-<p>通过 Invisible 返回内容但不打印出来</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  s <span class="operator">&lt;-</span> 1<span class="operator">:</span><span class="number">10</span></span><br><span class="line">  <span class="built_in">return</span><span class="punctuation">(</span>s<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">f<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">rlang<span class="operator">::</span>abort<span class="punctuation">(</span>f<span class="punctuation">(</span>j<span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
-<pre><code>#&gt;  [1]  1  2  3  4  5  6  7  8  9 10
+<pre><code>#&gt; Error: Oops!
 </code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f2 <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  s <span class="operator">&lt;-</span> 1<span class="operator">:</span><span class="number">10</span></span><br><span class="line">  <span class="built_in">invisible</span><span class="punctuation">(</span>s<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">f2<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">rlang<span class="operator">::</span>last_trace<span class="punctuation">(</span>f<span class="punctuation">(</span>j<span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f2_return <span class="operator">&lt;-</span> f2<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">f2_return</span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt;  [1]  1  2  3  4  5  6  7  8  9 10
+<pre><code>#&gt; Error: Can&#39;t show last error because no error was recorded yet
 </code></pre>
-<h3 id="Function-closures-函数闭包"><a href="#Function-closures-函数闭包" class="headerlink" title="Function closures 函数闭包"></a>Function closures 函数闭包</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># &lt;&lt;- assigns values to the parent environment</span></span><br><span class="line">stop_watch <span class="operator">=</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  start_time <span class="operator">=</span> stop_time <span class="operator">=</span> <span class="literal">NULL</span></span><br><span class="line">  start <span class="operator">=</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> start_time <span class="operator">&lt;&lt;-</span> Sys.time<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">  stop <span class="operator">=</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    stop_time <span class="operator">&lt;&lt;-</span> Sys.time<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">    difftime<span class="punctuation">(</span>stop_time<span class="punctuation">,</span> start_time<span class="punctuation">)</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="built_in">list</span><span class="punctuation">(</span>start <span class="operator">=</span> start<span class="punctuation">,</span> stop <span class="operator">=</span> stop<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">watch <span class="operator">=</span> stop_watch<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">watch</span><br></pre></td></tr></table></figure>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="number">1</span><span class="operator">+</span>a</span><br></pre></td></tr></table></figure>
 
-<pre><code>#&gt; $start
-#&gt; function() start_time &lt;&lt;- Sys.time()
-#&gt; &lt;environment: 0x000001f1d739f7f8&gt;
-#&gt; 
-#&gt; $stop
-#&gt; function() &#123;
-#&gt;     stop_time &lt;&lt;- Sys.time()
-#&gt;     difftime(stop_time, start_time)
-#&gt;   &#125;
-#&gt; &lt;environment: 0x000001f1d739f7f8&gt;
+<pre><code>#&gt; Error in eval(expr, envir, enclos): object &#39;a&#39; not found
 </code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">watch<span class="operator">$</span>start<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">watch<span class="operator">$</span>stop<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">rlang<span class="operator">::</span>last_trace<span class="punctuation">(</span><span class="number">1</span><span class="operator">+</span>a<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
-<pre><code>#&gt; Time difference of 0.0009000301 secs
+<pre><code>#&gt; Error: Can&#39;t show last error because no error was recorded yet
 </code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># 意思是 counter 函数最后返回的的 iplus 函数 </span></span><br><span class="line">counter <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">   i <span class="operator">&lt;-</span> 0</span><br><span class="line">   iplus <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">      i <span class="operator">&lt;&lt;-</span> i<span class="operator">+</span><span class="number">1</span></span><br><span class="line">      i </span><br><span class="line">   <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="comment"># 注意 没有（）括号 fanhui</span></span><br><span class="line">    iplus</span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 这里相当于把 iplus 函数 传递给了c1</span></span><br><span class="line">c1 <span class="operator">&lt;-</span>counter<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">c1</span><br><span class="line"><span class="comment">#&gt; function()&#123;</span></span><br><span class="line"><span class="comment">#&gt;       i &lt;&lt;- i+1</span></span><br><span class="line"><span class="comment">#&gt;       i </span></span><br><span class="line"><span class="comment">#&gt;    &#125;</span></span><br><span class="line"><span class="comment">#&gt; &lt;environment: 0x000001f1d920fa30&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># c1的环境在 counter里 i &lt;&lt;- i+1 把i放到了counter的环境里</span></span><br><span class="line">environment<span class="punctuation">(</span>c1<span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; &lt;environment: 0x000001f1d920fa30&gt;</span></span><br><span class="line"></span><br><span class="line">environment<span class="punctuation">(</span>counter<span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; &lt;environment: R_GlobalEnv&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行c1() 就是相当于 运行了 iplus 函数 </span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 1</span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 2</span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 3</span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 4</span></span><br></pre></td></tr></table></figure>
+<h3 id="Interactive-debugger"><a href="#Interactive-debugger" class="headerlink" title="Interactive debugger"></a><strong>Interactive debugger</strong></h3><p>函数报错 则在函数内部插入 browser() 运行到 browser()便出现互交的调试界面</p>
+<p>跟pycharm一样方便的调试</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">g <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>b<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  <span class="built_in">browser</span><span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">  h<span class="punctuation">(</span>b<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">f<span class="punctuation">(</span><span class="number">10</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Called from: g(a)
+#&gt; debug at &lt;text&gt;#3: h(b)
+
+#&gt; [1] 20
+</code></pre>
+<h4 id><a href="#" class="headerlink" title></a></h4><p><strong>Breakpoints</strong><br>可以通过单击行号左侧或按 Shift + F9来设置断点。断点的行为类似于浏览器() ，但它们更容易设置(单击一次而不是按9次键) ，并且不会冒险在源代码中意外包含一个浏览器()语句。断点有两个小小的缺点:</p>
 ]]></content>
       <categories>
         <category>R</category>
       </categories>
       <tags>
-        <tag>R note</tag>
+        <tag>adv-R</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2022/09/25/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
   </entry>
   <entry>
     <title>glue学习</title>
@@ -511,6 +426,91 @@ lapply(list(1:3, 4:5), `+`, 100)
       </tags>
   </entry>
   <entry>
+    <title>efficient R programming</title>
+    <url>/2022/10/06/efficient%20R%20programming%20%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<h2 id><a href="#" class="headerlink" title></a></h2><h2 id="书本网址："><a href="#书本网址：" class="headerlink" title="书本网址："></a>书本网址：</h2><p><a href="https://csgillespie.github.io/efficientR/programming.html#ref-Wickham2014">3 Efficient programming | Efficient R programming (csgillespie.github.io)</a></p>
+<h2 id="3-Efficient-programming"><a href="#3-Efficient-programming" class="headerlink" title="3 Efficient programming"></a>3 Efficient programming</h2><h3 id="try的使用"><a href="#try的使用" class="headerlink" title="try的使用"></a>try的使用</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">good <span class="operator">=</span> try<span class="punctuation">(</span><span class="number">1</span> <span class="operator">+</span> <span class="number">1</span><span class="punctuation">,</span> silent <span class="operator">=</span> <span class="literal">TRUE</span><span class="punctuation">)</span></span><br><span class="line">bad <span class="operator">=</span> try<span class="punctuation">(</span><span class="number">1</span> <span class="operator">+</span> <span class="string">&quot;1&quot;</span><span class="punctuation">,</span> silent <span class="operator">=</span> <span class="literal">TRUE</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">good</span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; [1] 2
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">bad</span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; [1] &quot;Error in 1 + \&quot;1\&quot; : non-numeric argument to binary operator\n&quot;
+#&gt; attr(,&quot;class&quot;)
+#&gt; [1] &quot;try-error&quot;
+#&gt; attr(,&quot;condition&quot;)
+#&gt; &lt;simpleError in 1 + &quot;1&quot;: non-numeric argument to binary operator&gt;
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="built_in">class</span><span class="punctuation">(</span>bad<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; [1] &quot;try-error&quot;
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="built_in">class</span><span class="punctuation">(</span>bad<span class="punctuation">)</span> <span class="operator">==</span> <span class="string">&quot;try-error&quot;</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; [1] TRUE
+</code></pre>
+<p>try遇到error 返回 try-error 类型，所以可以根据这个判断执行什么操作</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="punctuation">(</span><span class="built_in">class</span><span class="punctuation">(</span>bad<span class="punctuation">)</span> <span class="operator">==</span> <span class="string">&quot;try-error&quot;</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  </span><br><span class="line">  <span class="comment"># do something</span></span><br><span class="line">  </span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; NULL
+</code></pre>
+<h3 id="Invisible-返回不可见的return"><a href="#Invisible-返回不可见的return" class="headerlink" title="Invisible 返回不可见的return"></a>Invisible 返回不可见的return</h3><p>运行函数没有赋值时，会把return的内容打印的屏幕，有时候内容较多，且我们不需要赋值时，可以</p>
+<p>通过 Invisible 返回内容但不打印出来</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  s <span class="operator">&lt;-</span> 1<span class="operator">:</span><span class="number">10</span></span><br><span class="line">  <span class="built_in">return</span><span class="punctuation">(</span>s<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">f<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt;  [1]  1  2  3  4  5  6  7  8  9 10
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f2 <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  s <span class="operator">&lt;-</span> 1<span class="operator">:</span><span class="number">10</span></span><br><span class="line">  <span class="built_in">invisible</span><span class="punctuation">(</span>s<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">f2<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f2_return <span class="operator">&lt;-</span> f2<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">f2_return</span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt;  [1]  1  2  3  4  5  6  7  8  9 10
+</code></pre>
+<h3 id="Function-closures-函数闭包"><a href="#Function-closures-函数闭包" class="headerlink" title="Function closures 函数闭包"></a>Function closures 函数闭包</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># &lt;&lt;- assigns values to the parent environment</span></span><br><span class="line">stop_watch <span class="operator">=</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  start_time <span class="operator">=</span> stop_time <span class="operator">=</span> <span class="literal">NULL</span></span><br><span class="line">  start <span class="operator">=</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> start_time <span class="operator">&lt;&lt;-</span> Sys.time<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">  stop <span class="operator">=</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    stop_time <span class="operator">&lt;&lt;-</span> Sys.time<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">    difftime<span class="punctuation">(</span>stop_time<span class="punctuation">,</span> start_time<span class="punctuation">)</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="built_in">list</span><span class="punctuation">(</span>start <span class="operator">=</span> start<span class="punctuation">,</span> stop <span class="operator">=</span> stop<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">watch <span class="operator">=</span> stop_watch<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">watch</span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; $start
+#&gt; function() start_time &lt;&lt;- Sys.time()
+#&gt; &lt;environment: 0x000001f1d739f7f8&gt;
+#&gt; 
+#&gt; $stop
+#&gt; function() &#123;
+#&gt;     stop_time &lt;&lt;- Sys.time()
+#&gt;     difftime(stop_time, start_time)
+#&gt;   &#125;
+#&gt; &lt;environment: 0x000001f1d739f7f8&gt;
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">watch<span class="operator">$</span>start<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">watch<span class="operator">$</span>stop<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Time difference of 0.0009000301 secs
+</code></pre>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># 意思是 counter 函数最后返回的的 iplus 函数 </span></span><br><span class="line">counter <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">   i <span class="operator">&lt;-</span> 0</span><br><span class="line">   iplus <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">      i <span class="operator">&lt;&lt;-</span> i<span class="operator">+</span><span class="number">1</span></span><br><span class="line">      i </span><br><span class="line">   <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="comment"># 注意 没有（）括号 fanhui</span></span><br><span class="line">    iplus</span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 这里相当于把 iplus 函数 传递给了c1</span></span><br><span class="line">c1 <span class="operator">&lt;-</span>counter<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">c1</span><br><span class="line"><span class="comment">#&gt; function()&#123;</span></span><br><span class="line"><span class="comment">#&gt;       i &lt;&lt;- i+1</span></span><br><span class="line"><span class="comment">#&gt;       i </span></span><br><span class="line"><span class="comment">#&gt;    &#125;</span></span><br><span class="line"><span class="comment">#&gt; &lt;environment: 0x000001f1d920fa30&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># c1的环境在 counter里 i &lt;&lt;- i+1 把i放到了counter的环境里</span></span><br><span class="line">environment<span class="punctuation">(</span>c1<span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; &lt;environment: 0x000001f1d920fa30&gt;</span></span><br><span class="line"></span><br><span class="line">environment<span class="punctuation">(</span>counter<span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; &lt;environment: R_GlobalEnv&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行c1() 就是相当于 运行了 iplus 函数 </span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 1</span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 2</span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 3</span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 4</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>R</category>
+      </categories>
+      <tags>
+        <tag>R note</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2022/09/25/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+  </entry>
+  <entry>
     <title>hexo教程</title>
     <url>/2022/09/25/hexo%E6%95%99%E7%A8%8B/</url>
     <content><![CDATA[<h1 id="githubio-hexo-使用"><a href="#githubio-hexo-使用" class="headerlink" title="githubio_hexo_使用"></a>githubio_hexo_使用</h1><p><code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</code></p>
@@ -572,17 +572,62 @@ lapply(list(1:3, 4:5), `+`, 100)
 ]]></content>
   </entry>
   <entry>
-    <title>test_english_name</title>
+    <title></title>
     <url>/2022/10/10/test_english/</url>
-    <content><![CDATA[<h2 id><a href="#" class="headerlink" title></a></h2><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">plot<span class="punctuation">(</span>mtcars<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+    <content><![CDATA[<h1 id="test-english-name"><a href="#test-english-name" class="headerlink" title="test_english_name"></a>test_english_name</h1><p>junjie<br>10&#x2F;10&#x2F;22</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">plot<span class="punctuation">(</span>mtcars<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
-<img src="/2022/10/10/test_english/figure-gfm/unnamed-chunk-1-1.png" width="768">
+<p><img src="/2022/10/10/test_english/figure-gfm/unnamed-chunk-1-1.png"></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>使用scale_fill* 超出指定范围的值设定为NA的颜色</title>
+    <url>/2022/10/03/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/</url>
+    <content><![CDATA[<h3 id="scale-fill-的一些参数使用"><a href="#scale-fill-的一些参数使用" class="headerlink" title="scale_fill* 的一些参数使用"></a><strong>scale_fill* 的一些参数使用</strong></h3><p><strong>scale_fill_gradient指定颜色梯度</strong></p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">library<span class="punctuation">(</span>ggplot2<span class="punctuation">)</span></span><br><span class="line">library<span class="punctuation">(</span>reshape2<span class="punctuation">)</span></span><br><span class="line">library<span class="punctuation">(</span>scales<span class="punctuation">)</span></span><br><span class="line">a <span class="operator">=</span> rnorm<span class="punctuation">(</span><span class="number">17</span><span class="operator">*</span><span class="number">17</span><span class="punctuation">,</span> <span class="number">0.733</span><span class="punctuation">,</span><span class="number">0.21</span><span class="punctuation">)</span></span><br><span class="line">qcMat <span class="operator">=</span> matrix<span class="punctuation">(</span>a<span class="punctuation">,</span> ncol <span class="operator">=</span> <span class="number">17</span><span class="punctuation">)</span></span><br><span class="line">qcMat<span class="punctuation">[</span>qcMat<span class="operator">&gt;</span> <span class="number">1</span><span class="punctuation">]</span> <span class="operator">=</span> <span class="number">1</span></span><br><span class="line"><span class="comment"># qcMat contains values between 0 and 1 and some NAs</span></span><br><span class="line"></span><br><span class="line">m <span class="operator">=</span> reshape2<span class="operator">::</span>melt<span class="punctuation">(</span>t<span class="punctuation">(</span>qcMat<span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line">m<span class="operator">$</span>Var2 <span class="operator">&lt;-</span> with<span class="punctuation">(</span>m<span class="punctuation">,</span>factor<span class="punctuation">(</span>Var2<span class="punctuation">,</span> levels <span class="operator">=</span> rev<span class="punctuation">(</span>sort<span class="punctuation">(</span>unique<span class="punctuation">(</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">ggplot<span class="punctuation">(</span>m<span class="punctuation">,</span> aes<span class="punctuation">(</span>as.factor<span class="punctuation">(</span>Var1<span class="punctuation">)</span><span class="punctuation">,</span> Var2<span class="punctuation">,</span> group<span class="operator">=</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_tile<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> value<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_text<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> m<span class="operator">$</span>value<span class="punctuation">,</span> label <span class="operator">=</span> <span class="built_in">round</span><span class="punctuation">(</span>m<span class="operator">$</span>value<span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  scale_fill_gradient<span class="punctuation">(</span>low <span class="operator">=</span> <span class="string">&quot;red&quot;</span><span class="punctuation">,</span> high <span class="operator">=</span> <span class="string">&quot;green&quot;</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  xlab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> ylab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Warning: Ignoring unknown aesthetics: fill
+
+#&gt; Warning: Use of `m$value` is discouraged. Use `value` instead.
+#&gt; Use of `m$value` is discouraged. Use `value` instead.
+</code></pre>
+<img src="/2022/10/03/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-1-1.png" width="768">
+
+<p><strong>limits参数 设定映射范围，超范围默认为NA的颜色 灰色</strong></p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># scale_fill_gradient 指定颜色时 设定映射范围，超范围默认为NA的颜色 灰色 </span></span><br><span class="line">ggplot<span class="punctuation">(</span>m<span class="punctuation">,</span> aes<span class="punctuation">(</span>as.factor<span class="punctuation">(</span>Var1<span class="punctuation">)</span><span class="punctuation">,</span> Var2<span class="punctuation">,</span> group<span class="operator">=</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_tile<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> value<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_text<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> m<span class="operator">$</span>value<span class="punctuation">,</span> label <span class="operator">=</span> <span class="built_in">round</span><span class="punctuation">(</span>m<span class="operator">$</span>value<span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  <span class="comment"># scale_fill_gradient(low = &quot;red&quot;, high = &quot;green&quot;) +</span></span><br><span class="line">  </span><br><span class="line">  scale_fill_gradient<span class="punctuation">(</span>low <span class="operator">=</span> <span class="string">&quot;red&quot;</span><span class="punctuation">,</span> high <span class="operator">=</span> <span class="string">&quot;green&quot;</span><span class="punctuation">,</span> limits<span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="number">0.6</span><span class="punctuation">,</span> <span class="number">1</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="operator">+</span></span><br><span class="line">  </span><br><span class="line">  xlab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> ylab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Warning: Ignoring unknown aesthetics: fill
+
+#&gt; Warning: Use of `m$value` is discouraged. Use `value` instead.
+#&gt; Use of `m$value` is discouraged. Use `value` instead.
+</code></pre>
+<img src="/2022/10/03/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-2-1.png" width="768">
+
+<p><strong>na.value参数指定NA的颜色</strong></p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># scale_fill_gradient 指定颜色时 设定映射范围，超范围默认为NA的颜色 灰色 </span></span><br><span class="line"><span class="comment"># 指定NA的颜色为蓝色</span></span><br><span class="line">ggplot<span class="punctuation">(</span>m<span class="punctuation">,</span> aes<span class="punctuation">(</span>as.factor<span class="punctuation">(</span>Var1<span class="punctuation">)</span><span class="punctuation">,</span> Var2<span class="punctuation">,</span> group<span class="operator">=</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_tile<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> value<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_text<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> m<span class="operator">$</span>value<span class="punctuation">,</span> label <span class="operator">=</span> <span class="built_in">round</span><span class="punctuation">(</span>m<span class="operator">$</span>value<span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  <span class="comment"># scale_fill_gradient(low = &quot;red&quot;, high = &quot;green&quot;) +</span></span><br><span class="line">  scale_fill_gradient<span class="punctuation">(</span>low <span class="operator">=</span> <span class="string">&quot;red&quot;</span><span class="punctuation">,</span> high <span class="operator">=</span> <span class="string">&quot;green&quot;</span><span class="punctuation">,</span> limits<span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="number">0.6</span><span class="punctuation">,</span> <span class="number">1</span><span class="punctuation">)</span><span class="punctuation">,</span>na.value <span class="operator">=</span> <span class="string">&quot;blue&quot;</span><span class="punctuation">)</span><span class="operator">+</span></span><br><span class="line">  </span><br><span class="line">  xlab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> ylab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Warning: Ignoring unknown aesthetics: fill
+
+#&gt; Warning: Use of `m$value` is discouraged. Use `value` instead.
+#&gt; Use of `m$value` is discouraged. Use `value` instead.
+</code></pre>
+<img src="/2022/10/03/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-3-1.png" width="768">
+
+<p><strong>oob&#x3D;squish 把超出范围的value 压缩到 指定范围的min or max</strong></p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># oob=squish 把超出范围的value  压缩到 指定范围的min or max </span></span><br><span class="line">ggplot<span class="punctuation">(</span>m<span class="punctuation">,</span> aes<span class="punctuation">(</span>as.factor<span class="punctuation">(</span>Var1<span class="punctuation">)</span><span class="punctuation">,</span> Var2<span class="punctuation">,</span> group<span class="operator">=</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_tile<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> value<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_text<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> m<span class="operator">$</span>value<span class="punctuation">,</span> label <span class="operator">=</span> <span class="built_in">round</span><span class="punctuation">(</span>m<span class="operator">$</span>value<span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  <span class="comment"># scale_fill_gradient(low = &quot;red&quot;, high = &quot;green&quot;) +</span></span><br><span class="line">  </span><br><span class="line">  scale_fill_gradient<span class="punctuation">(</span>low <span class="operator">=</span> <span class="string">&quot;red&quot;</span><span class="punctuation">,</span> high <span class="operator">=</span> <span class="string">&quot;green&quot;</span><span class="punctuation">,</span> limits<span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="number">0.6</span><span class="punctuation">,</span> <span class="number">1</span><span class="punctuation">)</span><span class="punctuation">,</span> oob<span class="operator">=</span>squish<span class="punctuation">)</span><span class="operator">+</span></span><br><span class="line">  </span><br><span class="line">  xlab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> ylab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Warning: Ignoring unknown aesthetics: fill
+
+#&gt; Warning: Use of `m$value` is discouraged. Use `value` instead.
+#&gt; Use of `m$value` is discouraged. Use `value` instead.
+</code></pre>
+<img src="/2022/10/03/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-4-1.png" width="768">
 ]]></content>
       <categories>
-        <category>R</category>
+        <category>ggplot</category>
       </categories>
       <tags>
-        <tag>R tip</tag>
+        <tag>ggplot</tag>
       </tags>
   </entry>
   <entry>
@@ -627,56 +672,6 @@ lapply(list(1:3, 4:5), `+`, 100)
 <figure class="highlight r"><table><tr><td class="code"><pre><span class="line">image<span class="punctuation">(</span><span class="built_in">seq_along</span><span class="punctuation">(</span>svals<span class="punctuation">)</span><span class="punctuation">,</span> <span class="number">1</span><span class="punctuation">,</span> as.matrix<span class="punctuation">(</span><span class="built_in">seq_along</span><span class="punctuation">(</span>svals<span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">,</span> col<span class="operator">=</span>colors<span class="punctuation">,</span></span><br><span class="line">      axes<span class="operator">=</span><span class="literal">FALSE</span><span class="punctuation">,</span> xlab<span class="operator">=</span><span class="string">&quot;&quot;</span><span class="punctuation">,</span> ylab<span class="operator">=</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
 <img src="/2022/10/04/%E8%BF%9E%E7%BB%AD%E5%9E%8B%E5%8F%98%E9%87%8F%E8%BD%AC%E6%8D%A2%E4%B8%BA%E7%9B%B8%E5%BA%94%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-6-1.png" width="768">
-]]></content>
-      <categories>
-        <category>ggplot</category>
-      </categories>
-      <tags>
-        <tag>ggplot</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>使用scale_fill* 超出指定范围的值设定为NA的颜色</title>
-    <url>/2022/10/03/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/</url>
-    <content><![CDATA[<h3 id="scale-fill-的一些参数使用"><a href="#scale-fill-的一些参数使用" class="headerlink" title="scale_fill* 的一些参数使用"></a><strong>scale_fill* 的一些参数使用</strong></h3><p><strong>scale_fill_gradient指定颜色梯度</strong></p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">library<span class="punctuation">(</span>ggplot2<span class="punctuation">)</span></span><br><span class="line">library<span class="punctuation">(</span>reshape2<span class="punctuation">)</span></span><br><span class="line">library<span class="punctuation">(</span>scales<span class="punctuation">)</span></span><br><span class="line">a <span class="operator">=</span> rnorm<span class="punctuation">(</span><span class="number">17</span><span class="operator">*</span><span class="number">17</span><span class="punctuation">,</span> <span class="number">0.733</span><span class="punctuation">,</span><span class="number">0.21</span><span class="punctuation">)</span></span><br><span class="line">qcMat <span class="operator">=</span> matrix<span class="punctuation">(</span>a<span class="punctuation">,</span> ncol <span class="operator">=</span> <span class="number">17</span><span class="punctuation">)</span></span><br><span class="line">qcMat<span class="punctuation">[</span>qcMat<span class="operator">&gt;</span> <span class="number">1</span><span class="punctuation">]</span> <span class="operator">=</span> <span class="number">1</span></span><br><span class="line"><span class="comment"># qcMat contains values between 0 and 1 and some NAs</span></span><br><span class="line"></span><br><span class="line">m <span class="operator">=</span> reshape2<span class="operator">::</span>melt<span class="punctuation">(</span>t<span class="punctuation">(</span>qcMat<span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line">m<span class="operator">$</span>Var2 <span class="operator">&lt;-</span> with<span class="punctuation">(</span>m<span class="punctuation">,</span>factor<span class="punctuation">(</span>Var2<span class="punctuation">,</span> levels <span class="operator">=</span> rev<span class="punctuation">(</span>sort<span class="punctuation">(</span>unique<span class="punctuation">(</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">ggplot<span class="punctuation">(</span>m<span class="punctuation">,</span> aes<span class="punctuation">(</span>as.factor<span class="punctuation">(</span>Var1<span class="punctuation">)</span><span class="punctuation">,</span> Var2<span class="punctuation">,</span> group<span class="operator">=</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_tile<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> value<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_text<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> m<span class="operator">$</span>value<span class="punctuation">,</span> label <span class="operator">=</span> <span class="built_in">round</span><span class="punctuation">(</span>m<span class="operator">$</span>value<span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  scale_fill_gradient<span class="punctuation">(</span>low <span class="operator">=</span> <span class="string">&quot;red&quot;</span><span class="punctuation">,</span> high <span class="operator">=</span> <span class="string">&quot;green&quot;</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  xlab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> ylab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Warning: Ignoring unknown aesthetics: fill
-
-#&gt; Warning: Use of `m$value` is discouraged. Use `value` instead.
-#&gt; Use of `m$value` is discouraged. Use `value` instead.
-</code></pre>
-<img src="/2022/10/03/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-1-1.png" width="768">
-
-<p><strong>limits参数 设定映射范围，超范围默认为NA的颜色 灰色</strong></p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># scale_fill_gradient 指定颜色时 设定映射范围，超范围默认为NA的颜色 灰色 </span></span><br><span class="line">ggplot<span class="punctuation">(</span>m<span class="punctuation">,</span> aes<span class="punctuation">(</span>as.factor<span class="punctuation">(</span>Var1<span class="punctuation">)</span><span class="punctuation">,</span> Var2<span class="punctuation">,</span> group<span class="operator">=</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_tile<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> value<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_text<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> m<span class="operator">$</span>value<span class="punctuation">,</span> label <span class="operator">=</span> <span class="built_in">round</span><span class="punctuation">(</span>m<span class="operator">$</span>value<span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  <span class="comment"># scale_fill_gradient(low = &quot;red&quot;, high = &quot;green&quot;) +</span></span><br><span class="line">  </span><br><span class="line">  scale_fill_gradient<span class="punctuation">(</span>low <span class="operator">=</span> <span class="string">&quot;red&quot;</span><span class="punctuation">,</span> high <span class="operator">=</span> <span class="string">&quot;green&quot;</span><span class="punctuation">,</span> limits<span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="number">0.6</span><span class="punctuation">,</span> <span class="number">1</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="operator">+</span></span><br><span class="line">  </span><br><span class="line">  xlab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> ylab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Warning: Ignoring unknown aesthetics: fill
-
-#&gt; Warning: Use of `m$value` is discouraged. Use `value` instead.
-#&gt; Use of `m$value` is discouraged. Use `value` instead.
-</code></pre>
-<img src="/2022/10/03/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-2-1.png" width="768">
-
-<p><strong>na.value参数指定NA的颜色</strong></p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># scale_fill_gradient 指定颜色时 设定映射范围，超范围默认为NA的颜色 灰色 </span></span><br><span class="line"><span class="comment"># 指定NA的颜色为蓝色</span></span><br><span class="line">ggplot<span class="punctuation">(</span>m<span class="punctuation">,</span> aes<span class="punctuation">(</span>as.factor<span class="punctuation">(</span>Var1<span class="punctuation">)</span><span class="punctuation">,</span> Var2<span class="punctuation">,</span> group<span class="operator">=</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_tile<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> value<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_text<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> m<span class="operator">$</span>value<span class="punctuation">,</span> label <span class="operator">=</span> <span class="built_in">round</span><span class="punctuation">(</span>m<span class="operator">$</span>value<span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  <span class="comment"># scale_fill_gradient(low = &quot;red&quot;, high = &quot;green&quot;) +</span></span><br><span class="line">  scale_fill_gradient<span class="punctuation">(</span>low <span class="operator">=</span> <span class="string">&quot;red&quot;</span><span class="punctuation">,</span> high <span class="operator">=</span> <span class="string">&quot;green&quot;</span><span class="punctuation">,</span> limits<span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="number">0.6</span><span class="punctuation">,</span> <span class="number">1</span><span class="punctuation">)</span><span class="punctuation">,</span>na.value <span class="operator">=</span> <span class="string">&quot;blue&quot;</span><span class="punctuation">)</span><span class="operator">+</span></span><br><span class="line">  </span><br><span class="line">  xlab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> ylab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Warning: Ignoring unknown aesthetics: fill
-
-#&gt; Warning: Use of `m$value` is discouraged. Use `value` instead.
-#&gt; Use of `m$value` is discouraged. Use `value` instead.
-</code></pre>
-<img src="/2022/10/03/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-3-1.png" width="768">
-
-<p><strong>oob&#x3D;squish 把超出范围的value 压缩到 指定范围的min or max</strong></p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># oob=squish 把超出范围的value  压缩到 指定范围的min or max </span></span><br><span class="line">ggplot<span class="punctuation">(</span>m<span class="punctuation">,</span> aes<span class="punctuation">(</span>as.factor<span class="punctuation">(</span>Var1<span class="punctuation">)</span><span class="punctuation">,</span> Var2<span class="punctuation">,</span> group<span class="operator">=</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_tile<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> value<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_text<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> m<span class="operator">$</span>value<span class="punctuation">,</span> label <span class="operator">=</span> <span class="built_in">round</span><span class="punctuation">(</span>m<span class="operator">$</span>value<span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  <span class="comment"># scale_fill_gradient(low = &quot;red&quot;, high = &quot;green&quot;) +</span></span><br><span class="line">  </span><br><span class="line">  scale_fill_gradient<span class="punctuation">(</span>low <span class="operator">=</span> <span class="string">&quot;red&quot;</span><span class="punctuation">,</span> high <span class="operator">=</span> <span class="string">&quot;green&quot;</span><span class="punctuation">,</span> limits<span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="number">0.6</span><span class="punctuation">,</span> <span class="number">1</span><span class="punctuation">)</span><span class="punctuation">,</span> oob<span class="operator">=</span>squish<span class="punctuation">)</span><span class="operator">+</span></span><br><span class="line">  </span><br><span class="line">  xlab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> ylab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Warning: Ignoring unknown aesthetics: fill
-
-#&gt; Warning: Use of `m$value` is discouraged. Use `value` instead.
-#&gt; Use of `m$value` is discouraged. Use `value` instead.
-</code></pre>
-<img src="/2022/10/03/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-4-1.png" width="768">
 ]]></content>
       <categories>
         <category>ggplot</category>
