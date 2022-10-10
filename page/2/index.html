@@ -183,6 +183,111 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/10/03/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="bio note">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/10/03/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/" class="post-title-link" itemprop="url">使用scale_fill* 超出指定范围的值设定为NA的颜色</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-10-03 21:03:12" itemprop="dateCreated datePublished" datetime="2022-10-03T21:03:12+08:00">2022-10-03</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ggplot/" itemprop="url" rel="index"><span itemprop="name">ggplot</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="scale-fill-的一些参数使用"><a href="#scale-fill-的一些参数使用" class="headerlink" title="scale_fill* 的一些参数使用"></a><strong>scale_fill* 的一些参数使用</strong></h3><p><strong>scale_fill_gradient指定颜色梯度</strong></p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">library<span class="punctuation">(</span>ggplot2<span class="punctuation">)</span></span><br><span class="line">library<span class="punctuation">(</span>reshape2<span class="punctuation">)</span></span><br><span class="line">library<span class="punctuation">(</span>scales<span class="punctuation">)</span></span><br><span class="line">a <span class="operator">=</span> rnorm<span class="punctuation">(</span><span class="number">17</span><span class="operator">*</span><span class="number">17</span><span class="punctuation">,</span> <span class="number">0.733</span><span class="punctuation">,</span><span class="number">0.21</span><span class="punctuation">)</span></span><br><span class="line">qcMat <span class="operator">=</span> matrix<span class="punctuation">(</span>a<span class="punctuation">,</span> ncol <span class="operator">=</span> <span class="number">17</span><span class="punctuation">)</span></span><br><span class="line">qcMat<span class="punctuation">[</span>qcMat<span class="operator">&gt;</span> <span class="number">1</span><span class="punctuation">]</span> <span class="operator">=</span> <span class="number">1</span></span><br><span class="line"><span class="comment"># qcMat contains values between 0 and 1 and some NAs</span></span><br><span class="line"></span><br><span class="line">m <span class="operator">=</span> reshape2<span class="operator">::</span>melt<span class="punctuation">(</span>t<span class="punctuation">(</span>qcMat<span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line">m<span class="operator">$</span>Var2 <span class="operator">&lt;-</span> with<span class="punctuation">(</span>m<span class="punctuation">,</span>factor<span class="punctuation">(</span>Var2<span class="punctuation">,</span> levels <span class="operator">=</span> rev<span class="punctuation">(</span>sort<span class="punctuation">(</span>unique<span class="punctuation">(</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">ggplot<span class="punctuation">(</span>m<span class="punctuation">,</span> aes<span class="punctuation">(</span>as.factor<span class="punctuation">(</span>Var1<span class="punctuation">)</span><span class="punctuation">,</span> Var2<span class="punctuation">,</span> group<span class="operator">=</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_tile<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> value<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_text<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> m<span class="operator">$</span>value<span class="punctuation">,</span> label <span class="operator">=</span> <span class="built_in">round</span><span class="punctuation">(</span>m<span class="operator">$</span>value<span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  scale_fill_gradient<span class="punctuation">(</span>low <span class="operator">=</span> <span class="string">&quot;red&quot;</span><span class="punctuation">,</span> high <span class="operator">=</span> <span class="string">&quot;green&quot;</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  xlab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> ylab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Warning: Ignoring unknown aesthetics: fill
+
+#&gt; Warning: Use of `m$value` is discouraged. Use `value` instead.
+#&gt; Use of `m$value` is discouraged. Use `value` instead.
+</code></pre>
+<img src="/2022/10/03/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-1-1.png" width="768">
+
+<p><strong>limits参数 设定映射范围，超范围默认为NA的颜色 灰色</strong></p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># scale_fill_gradient 指定颜色时 设定映射范围，超范围默认为NA的颜色 灰色 </span></span><br><span class="line">ggplot<span class="punctuation">(</span>m<span class="punctuation">,</span> aes<span class="punctuation">(</span>as.factor<span class="punctuation">(</span>Var1<span class="punctuation">)</span><span class="punctuation">,</span> Var2<span class="punctuation">,</span> group<span class="operator">=</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_tile<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> value<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_text<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> m<span class="operator">$</span>value<span class="punctuation">,</span> label <span class="operator">=</span> <span class="built_in">round</span><span class="punctuation">(</span>m<span class="operator">$</span>value<span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  <span class="comment"># scale_fill_gradient(low = &quot;red&quot;, high = &quot;green&quot;) +</span></span><br><span class="line">  </span><br><span class="line">  scale_fill_gradient<span class="punctuation">(</span>low <span class="operator">=</span> <span class="string">&quot;red&quot;</span><span class="punctuation">,</span> high <span class="operator">=</span> <span class="string">&quot;green&quot;</span><span class="punctuation">,</span> limits<span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="number">0.6</span><span class="punctuation">,</span> <span class="number">1</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="operator">+</span></span><br><span class="line">  </span><br><span class="line">  xlab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> ylab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Warning: Ignoring unknown aesthetics: fill
+
+#&gt; Warning: Use of `m$value` is discouraged. Use `value` instead.
+#&gt; Use of `m$value` is discouraged. Use `value` instead.
+</code></pre>
+<img src="/2022/10/03/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-2-1.png" width="768">
+
+<p><strong>na.value参数指定NA的颜色</strong></p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># scale_fill_gradient 指定颜色时 设定映射范围，超范围默认为NA的颜色 灰色 </span></span><br><span class="line"><span class="comment"># 指定NA的颜色为蓝色</span></span><br><span class="line">ggplot<span class="punctuation">(</span>m<span class="punctuation">,</span> aes<span class="punctuation">(</span>as.factor<span class="punctuation">(</span>Var1<span class="punctuation">)</span><span class="punctuation">,</span> Var2<span class="punctuation">,</span> group<span class="operator">=</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_tile<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> value<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_text<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> m<span class="operator">$</span>value<span class="punctuation">,</span> label <span class="operator">=</span> <span class="built_in">round</span><span class="punctuation">(</span>m<span class="operator">$</span>value<span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  <span class="comment"># scale_fill_gradient(low = &quot;red&quot;, high = &quot;green&quot;) +</span></span><br><span class="line">  scale_fill_gradient<span class="punctuation">(</span>low <span class="operator">=</span> <span class="string">&quot;red&quot;</span><span class="punctuation">,</span> high <span class="operator">=</span> <span class="string">&quot;green&quot;</span><span class="punctuation">,</span> limits<span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="number">0.6</span><span class="punctuation">,</span> <span class="number">1</span><span class="punctuation">)</span><span class="punctuation">,</span>na.value <span class="operator">=</span> <span class="string">&quot;blue&quot;</span><span class="punctuation">)</span><span class="operator">+</span></span><br><span class="line">  </span><br><span class="line">  xlab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> ylab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Warning: Ignoring unknown aesthetics: fill
+
+#&gt; Warning: Use of `m$value` is discouraged. Use `value` instead.
+#&gt; Use of `m$value` is discouraged. Use `value` instead.
+</code></pre>
+<img src="/2022/10/03/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-3-1.png" width="768">
+
+<p><strong>oob&#x3D;squish 把超出范围的value 压缩到 指定范围的min or max</strong></p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># oob=squish 把超出范围的value  压缩到 指定范围的min or max </span></span><br><span class="line">ggplot<span class="punctuation">(</span>m<span class="punctuation">,</span> aes<span class="punctuation">(</span>as.factor<span class="punctuation">(</span>Var1<span class="punctuation">)</span><span class="punctuation">,</span> Var2<span class="punctuation">,</span> group<span class="operator">=</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_tile<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> value<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_text<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> m<span class="operator">$</span>value<span class="punctuation">,</span> label <span class="operator">=</span> <span class="built_in">round</span><span class="punctuation">(</span>m<span class="operator">$</span>value<span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  <span class="comment"># scale_fill_gradient(low = &quot;red&quot;, high = &quot;green&quot;) +</span></span><br><span class="line">  </span><br><span class="line">  scale_fill_gradient<span class="punctuation">(</span>low <span class="operator">=</span> <span class="string">&quot;red&quot;</span><span class="punctuation">,</span> high <span class="operator">=</span> <span class="string">&quot;green&quot;</span><span class="punctuation">,</span> limits<span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="number">0.6</span><span class="punctuation">,</span> <span class="number">1</span><span class="punctuation">)</span><span class="punctuation">,</span> oob<span class="operator">=</span>squish<span class="punctuation">)</span><span class="operator">+</span></span><br><span class="line">  </span><br><span class="line">  xlab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> ylab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt; Warning: Ignoring unknown aesthetics: fill
+
+#&gt; Warning: Use of `m$value` is discouraged. Use `value` instead.
+#&gt; Use of `m$value` is discouraged. Use `value` instead.
+</code></pre>
+<img src="/2022/10/03/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-4-1.png" width="768">
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/26/glue/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -683,7 +788,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-count">16</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
