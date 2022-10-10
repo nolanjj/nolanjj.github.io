@@ -27,16 +27,16 @@
 <meta property="og:site_name" content="bio note">
 <meta property="og:description" content="1234567891011library(scales)# 创建valuevalues &lt;- c(seq(1:10)&#x2F;10)#  colorRamp 返回一个返回 用于后续创建颜色f &lt;- colorRamp(c(&quot;white&quot;, &quot;blue&quot;))# 生成一个可作为rgb函数的输入的矩阵 f(values)  #&gt;        [,1]">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://example.com/.com//figure-gfm/unnamed-chunk-2-1.png">
-<meta property="og:image" content="http://example.com/.com//figure-gfm/unnamed-chunk-4-1.png">
-<meta property="og:image" content="http://example.com/.com//figure-gfm/unnamed-chunk-5-1.png">
-<meta property="og:image" content="http://example.com/.com//figure-gfm/unnamed-chunk-6-1.png">
+<meta property="og:image" content="http://example.com/%E8%BF%9E%E7%BB%AD%E5%9E%8B%E5%8F%98%E9%87%8F%E8%BD%AC%E6%8D%A2%E4%B8%BA%E7%9B%B8%E5%BA%94%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-2-1.png">
+<meta property="og:image" content="http://example.com/%E8%BF%9E%E7%BB%AD%E5%9E%8B%E5%8F%98%E9%87%8F%E8%BD%AC%E6%8D%A2%E4%B8%BA%E7%9B%B8%E5%BA%94%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-4-1.png">
+<meta property="og:image" content="http://example.com/%E8%BF%9E%E7%BB%AD%E5%9E%8B%E5%8F%98%E9%87%8F%E8%BD%AC%E6%8D%A2%E4%B8%BA%E7%9B%B8%E5%BA%94%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-5-1.png">
+<meta property="og:image" content="http://example.com/%E8%BF%9E%E7%BB%AD%E5%9E%8B%E5%8F%98%E9%87%8F%E8%BD%AC%E6%8D%A2%E4%B8%BA%E7%9B%B8%E5%BA%94%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-6-1.png">
 <meta property="article:published_time" content="2022-10-10T09:23:45.310Z">
 <meta property="article:modified_time" content="2022-10-10T09:23:45.312Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="ggplot">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/.com//figure-gfm/unnamed-chunk-2-1.png">
+<meta name="twitter:image" content="http://example.com/%E8%BF%9E%E7%BB%AD%E5%9E%8B%E5%8F%98%E9%87%8F%E8%BD%AC%E6%8D%A2%E4%B8%BA%E7%9B%B8%E5%BA%94%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-2-1.png">
 
 <link rel="canonical" href="http://example.com/%E8%BF%9E%E7%BB%AD%E5%9E%8B%E5%8F%98%E9%87%8F%E8%BD%AC%E6%8D%A2%E4%B8%BA%E7%9B%B8%E5%BA%94%E7%9A%84%E9%A2%9C%E8%89%B2/">
 
@@ -261,24 +261,24 @@
 </code></pre>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show_col<span class="punctuation">(</span>colors<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
-<img src="/.com//figure-gfm/unnamed-chunk-2-1.png" width="768">
+<img src="/%E8%BF%9E%E7%BB%AD%E5%9E%8B%E5%8F%98%E9%87%8F%E8%BD%AC%E6%8D%A2%E4%B8%BA%E7%9B%B8%E5%BA%94%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-2-1.png" width="768">
 
 <h3 id="Scale-your-values-to-range-between-0-and-1"><a href="#Scale-your-values-to-range-between-0-and-1" class="headerlink" title="Scale your values to range between 0 and 1"></a>Scale your values to range between 0 and 1</h3><p><strong>scale 过程</strong></p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">value2 <span class="operator">&lt;-</span> 1<span class="operator">:</span><span class="number">20</span></span><br><span class="line">rr <span class="operator">&lt;-</span> <span class="built_in">range</span><span class="punctuation">(</span>value2<span class="punctuation">)</span></span><br><span class="line">svals <span class="operator">&lt;-</span> <span class="punctuation">(</span>value2<span class="operator">-</span>rr<span class="punctuation">[</span><span class="number">1</span><span class="punctuation">]</span><span class="punctuation">)</span><span class="operator">/</span>diff<span class="punctuation">(</span>rr<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
 <figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">f <span class="operator">&lt;-</span> colorRamp<span class="punctuation">(</span><span class="built_in">c</span><span class="punctuation">(</span><span class="string">&quot;yellow&quot;</span><span class="punctuation">,</span><span class="string">&quot;lightblue&quot;</span><span class="punctuation">,</span> <span class="string">&quot;blue&quot;</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line">colors <span class="operator">&lt;-</span> rgb<span class="punctuation">(</span>f<span class="punctuation">(</span>svals<span class="punctuation">)</span><span class="operator">/</span><span class="number">255</span><span class="punctuation">)</span></span><br><span class="line">show_col<span class="punctuation">(</span>colors<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
-<img src="/.com//figure-gfm/unnamed-chunk-4-1.png" width="768">
+<img src="/%E8%BF%9E%E7%BB%AD%E5%9E%8B%E5%8F%98%E9%87%8F%E8%BD%AC%E6%8D%A2%E4%B8%BA%E7%9B%B8%E5%BA%94%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-4-1.png" width="768">
 
 <p><strong>alpha 透明度</strong></p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">f <span class="operator">&lt;-</span> colorRamp<span class="punctuation">(</span><span class="built_in">c</span><span class="punctuation">(</span><span class="string">&quot;yellow&quot;</span><span class="punctuation">,</span><span class="string">&quot;lightblue&quot;</span><span class="punctuation">,</span> <span class="string">&quot;blue&quot;</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line">colors <span class="operator">&lt;-</span> rgb<span class="punctuation">(</span>f<span class="punctuation">(</span>svals<span class="punctuation">)</span><span class="operator">/</span><span class="number">255</span><span class="punctuation">,</span>alpha <span class="operator">=</span> <span class="number">0.3</span><span class="punctuation">)</span></span><br><span class="line">show_col<span class="punctuation">(</span>colors<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
-<img src="/.com//figure-gfm/unnamed-chunk-5-1.png" width="768">
+<img src="/%E8%BF%9E%E7%BB%AD%E5%9E%8B%E5%8F%98%E9%87%8F%E8%BD%AC%E6%8D%A2%E4%B8%BA%E7%9B%B8%E5%BA%94%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-5-1.png" width="768">
 
 <p><strong>image函数也可以将生成的colors颜色字符向量转化为颜色</strong></p>
 <figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">image<span class="punctuation">(</span><span class="built_in">seq_along</span><span class="punctuation">(</span>svals<span class="punctuation">)</span><span class="punctuation">,</span> <span class="number">1</span><span class="punctuation">,</span> as.matrix<span class="punctuation">(</span><span class="built_in">seq_along</span><span class="punctuation">(</span>svals<span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">,</span> col<span class="operator">=</span>colors<span class="punctuation">,</span></span><br><span class="line">      axes<span class="operator">=</span><span class="literal">FALSE</span><span class="punctuation">,</span> xlab<span class="operator">=</span><span class="string">&quot;&quot;</span><span class="punctuation">,</span> ylab<span class="operator">=</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
-<img src="/.com//figure-gfm/unnamed-chunk-6-1.png" width="768">
+<img src="/%E8%BF%9E%E7%BB%AD%E5%9E%8B%E5%8F%98%E9%87%8F%E8%BD%AC%E6%8D%A2%E4%B8%BA%E7%9B%B8%E5%BA%94%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-6-1.png" width="768">
 
     </div>
 
