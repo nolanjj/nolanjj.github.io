@@ -383,39 +383,6 @@ lapply(list(1:3, 4:5), `+`, 100)
       </tags>
   </entry>
   <entry>
-    <title>hexo教程</title>
-    <url>/2022/09/25/hexo%E6%95%99%E7%A8%8B/</url>
-    <content><![CDATA[<h1 id="githubio-hexo-使用"><a href="#githubio-hexo-使用" class="headerlink" title="githubio_hexo_使用"></a>githubio_hexo_使用</h1><p><code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</code></p>
-<h3 id="参考视频"><a href="#参考视频" class="headerlink" title="参考视频"></a>参考视频</h3><p><a href="https://www.bilibili.com/video/BV1mU4y1j72n/?p=5&spm_id_from=pageDriver&vd_source=054bcf480436b1c4a589dd66453c235a">发布博客到互联网_哔哩哔哩_bilibili</a></p>
-<h3 id="视频笔记"><a href="#视频笔记" class="headerlink" title="视频笔记"></a>视频笔记</h3><p><a href="https://www.bilibili.com/h5/note-app/view?cvid=14840804&pagefrom=comment">笔记详情 (bilibili.com)</a></p>
-<h3 id="报错解决"><a href="#报错解决" class="headerlink" title="报错解决"></a>报错解决</h3><p><a href="https://blog.csdn.net/qq_45685435/article/details/119863595">git报错:fatal: unable to auto-detect email address，我试错10多遍，我太难了_少年，又是你的博客-CSDN博客</a></p>
-<h3 id="配置及详细使用"><a href="#配置及详细使用" class="headerlink" title="配置及详细使用"></a>配置及详细使用</h3><p><a href="https://www.bilibili.com/video/BV1444y1179K/?spm_id_from=pageDriver&vd_source=054bcf480436b1c4a589dd66453c235a">使用Hexo搭建个人博客手摸手教学(6)|配置文件说明及常用命令_哔哩哔哩_bilibili</a></p>
-<p><a href="https://blog.csdn.net/qq_38140292/article/details/119076400">【hexo】基础教程-一-撰写文章_指尖听戏的博客-CSDN博客_hexo博客怎么写文章</a></p>
-<h3 id="显示图片"><a href="#显示图片" class="headerlink" title="显示图片"></a>显示图片</h3><p>参考：<br><a href="https://oldgerman.github.io/eeea93b8/">https://oldgerman.github.io/eeea93b8/</a><br>安装<br>npm install <a href="https://github.com/CodeFalling/hexo-asset-image">https://github.com/CodeFalling/hexo-asset-image</a> –save</p>
-]]></content>
-      <tags>
-        <tag>博客教程</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2022/09/25/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
-  </entry>
-  <entry>
     <title>glue学习</title>
     <url>/2022/09/26/glue/</url>
     <content><![CDATA[<h3 id="glue-处理字符串连接”-变量or表达式-”"><a href="#glue-处理字符串连接”-变量or表达式-”" class="headerlink" title="glue 处理字符串连接”{变量or表达式}”`"></a>glue 处理字符串连接”{变量or表达式}”`</h3><p>glue处理过后的字符串可以通过 + 和其他字符串进行连接，是可以接表达式</p>
@@ -524,6 +491,39 @@ lapply(list(1:3, 4:5), `+`, 100)
         <tag>R</tag>
         <tag>tidy</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>hexo教程</title>
+    <url>/2022/09/25/hexo%E6%95%99%E7%A8%8B/</url>
+    <content><![CDATA[<h1 id="githubio-hexo-使用"><a href="#githubio-hexo-使用" class="headerlink" title="githubio_hexo_使用"></a>githubio_hexo_使用</h1><p><code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</code></p>
+<h3 id="参考视频"><a href="#参考视频" class="headerlink" title="参考视频"></a>参考视频</h3><p><a href="https://www.bilibili.com/video/BV1mU4y1j72n/?p=5&spm_id_from=pageDriver&vd_source=054bcf480436b1c4a589dd66453c235a">发布博客到互联网_哔哩哔哩_bilibili</a></p>
+<h3 id="视频笔记"><a href="#视频笔记" class="headerlink" title="视频笔记"></a>视频笔记</h3><p><a href="https://www.bilibili.com/h5/note-app/view?cvid=14840804&pagefrom=comment">笔记详情 (bilibili.com)</a></p>
+<h3 id="报错解决"><a href="#报错解决" class="headerlink" title="报错解决"></a>报错解决</h3><p><a href="https://blog.csdn.net/qq_45685435/article/details/119863595">git报错:fatal: unable to auto-detect email address，我试错10多遍，我太难了_少年，又是你的博客-CSDN博客</a></p>
+<h3 id="配置及详细使用"><a href="#配置及详细使用" class="headerlink" title="配置及详细使用"></a>配置及详细使用</h3><p><a href="https://www.bilibili.com/video/BV1444y1179K/?spm_id_from=pageDriver&vd_source=054bcf480436b1c4a589dd66453c235a">使用Hexo搭建个人博客手摸手教学(6)|配置文件说明及常用命令_哔哩哔哩_bilibili</a></p>
+<p><a href="https://blog.csdn.net/qq_38140292/article/details/119076400">【hexo】基础教程-一-撰写文章_指尖听戏的博客-CSDN博客_hexo博客怎么写文章</a></p>
+<h3 id="显示图片"><a href="#显示图片" class="headerlink" title="显示图片"></a>显示图片</h3><p>参考：<br><a href="https://oldgerman.github.io/eeea93b8/">https://oldgerman.github.io/eeea93b8/</a><br>安装<br>npm install <a href="https://github.com/CodeFalling/hexo-asset-image">https://github.com/CodeFalling/hexo-asset-image</a> –save</p>
+]]></content>
+      <tags>
+        <tag>博客教程</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2022/09/25/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
   </entry>
   <entry>
     <title>quarto使用笔记</title>
