@@ -1,0 +1,127 @@
+<hr>
+<p>title: “获取基因长度计算FPKM_TPM”<br>format: hugo<br>editor: visual<br>date: today<br>knitr:<br>  opts_chunk:<br>    comment: “#&gt;”</p>
+<p>tags: [生信 RNA-seq]<br>categories: [生信]</p>
+<hr>
+<!--more-->
+
+<h2 id=""><a href="#" class="headerlink" title=""></a></h2><pre><code class="r">library(parallel)         #并行计算  parApply parLapply parSaplly 
+library(GenomicFeatures)
+library(dplyr)
+options(max.print = 10)
+</code></pre>
+<h2 id="使用GTF文件获取基因长度信息"><a href="#使用GTF文件获取基因长度信息" class="headerlink" title="使用GTF文件获取基因长度信息"></a>使用GTF文件获取基因长度信息</h2><p>参考: <a href="https://mp.weixin.qq.com/s/VsVDZPeJiNqwXUgj0mOVVA">https://mp.weixin.qq.com/s/VsVDZPeJiNqwXUgj0mOVVA</a></p>
+<pre><code class="r">cl &lt;- makeCluster(0.75*detectCores())  #设计启用计算机3/4的核
+
+## 利用GenomicFeatures包导入gtf处理
+txdb &lt;- makeTxDbFromGFF(&quot;../../post_share_data/Mus_musculus.GRCm39.108.gtf.gz&quot;,
+                        format=&quot;gtf&quot;) 
+
+## 提取基因外显子
+exons_gene &lt;- exonsBy(txdb, by = &quot;gene&quot;) 
+head(exons_gene)
+
+## 计算总外显子长度：用reduce去除掉重叠冗余的部分，,width统计长度，最后计算总长度
+exons_gene_lens &lt;- parLapply(cl,exons_gene,function(x){sum(width(reduce(x)))}) 
+exons_gene_lens[1:10]
+
+##转换为dataframe
+geneid_efflen &lt;- data.frame(geneid=names(exons_gene_lens),
+                            efflen=as.numeric(exons_gene_lens))
+</code></pre>
+<p>一列为基因名ENSEMBL ID 一列为基因长度</p>
+<pre><code class="r">load(&quot;../../post_share_data/geneid_efflen_Mus_GRCm39_108.RData&quot;)
+head(geneid_efflen)
+</code></pre>
+<pre><code>#&gt;               geneid efflen
+#&gt; 1 ENSMUSG00000000001   3262
+#&gt; 2 ENSMUSG00000000003    902
+#&gt; 3 ENSMUSG00000000028   3506
+#&gt; 4 ENSMUSG00000000031   2625
+#&gt; 5 ENSMUSG00000000037   6397
+#&gt;  [ reached &#39;max&#39; / getOption(&quot;max.print&quot;) -- omitted 1 rows ]
+</code></pre>
+<h2 id="counts转FPKM"><a href="#counts转FPKM" class="headerlink" title="counts转FPKM"></a>counts转FPKM</h2><p>参考: <a href="https://mp.weixin.qq.com/s/IUV9dSbRBK1nvetixKOCRw">Counts FPKM RPKM TPM CPM 的转化 (qq.com)</a></p>
+<pre><code class="r">load(&quot;../../post_share_data/counts_dat.RData&quot;)
+
+
+counts_dat_id &lt;- rownames(counts_dat)
+geneid_efflen_geneid &lt;- geneid_efflen$geneid
+
+# 获取共有id
+comm_id &lt;- intersect(counts_dat_id,geneid_efflen_geneid)
+
+
+# 过滤，id排序 保持id顺序一致
+geneid_efflen &lt;- geneid_efflen[geneid_efflen$geneid %in% comm_id,]
+comm_id &lt;- geneid_efflen$geneid
+counts_dat &lt;- counts_dat[comm_id,]
+
+
+
+# count--counts表达矩阵，efflength基因长度向量 基因和长度要对应
+counts2FPKM &lt;- function(count, efflength){    
+  
+  library(purrr)
+  
+  # 函数对每一个样本做FPKM
+  f &lt;- function(count_one,efflength){
+  # counts的每百万缩放因子 (“per million” scaling factor) 深度标准化   
+  PMSC_counts &lt;- sum(count_one)/1e6   
+  # 每百万reads/Fragments (Reads/Fragments Per Million) 长度标准化  
+  FPM &lt;- count_one/PMSC_counts         
+  FPM/(efflength/1000)   
+  }
+  
+  # 对全部样本做FPKM
+  FPKM_data &lt;- map_dfc(count,f,efflength)
+  
+  return(FPKM_data)
+  
+} 
+
+
+FPKM &lt;- counts2FPKM(count = counts_dat,efflength = geneid_efflen$efflen)
+</code></pre>
+<pre><code>#&gt; 
+#&gt; Attaching package: &#39;purrr&#39;
+
+#&gt; The following object is masked from &#39;package:GenomicRanges&#39;:
+#&gt; 
+#&gt;     reduce
+
+#&gt; The following object is masked from &#39;package:IRanges&#39;:
+#&gt; 
+#&gt;     reduce
+</code></pre>
+<h2 id="counts转TPM"><a href="#counts转TPM" class="headerlink" title="counts转TPM"></a>counts转TPM</h2><pre><code class="r">counts2TPM &lt;- function(count, efflength){   
+  
+  library(purrr)
+  
+  # 函数对每一个样本做FPKM
+  f &lt;- function(count_one,efflength){
+    
+  #每千碱基reads (reads per kilobase) 长度标准化
+  RPK &lt;- count_one/(efflength/1000)      
+  #RPK的每百万缩放因子 (“per million” scaling factor ) 深度标准化
+  PMSC_rpk &lt;- sum(RPK)/1e6           
+  RPK/PMSC_rpk
+    
+  }
+  
+  # 对全部样本做FPKM
+  TPM_data &lt;- map_dfc(count,f,efflength)
+  
+  return(TPM_data)
+
+}    
+
+TPM &lt;- counts2TPM(count = counts_dat,efflength = geneid_efflen$efflen)
+</code></pre>
+<h2 id="FPKM转TPM"><a href="#FPKM转TPM" class="headerlink" title="FPKM转TPM"></a>FPKM转TPM</h2><pre><code class="r">#FPKM与TPM的转化 
+FPKM2TPM &lt;- function(fpkm){
+  library(purrr)
+  TPM_data &lt;- map_dfc(fpkm,~ .x/sum(.x)*1e6   )
+} 
+
+TPM2 &lt;- FPKM2TPM(fpkm = FPKM)
+</code></pre>

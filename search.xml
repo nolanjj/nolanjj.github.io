@@ -1,675 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Biomart对基因进行注释</title>
-    <url>/Biomart%E5%AF%B9%E5%9F%BA%E5%9B%A0%E8%BF%9B%E8%A1%8C%E6%B3%A8%E9%87%8A/</url>
-    <content><![CDATA[<h3 id="对植物"><a href="#对植物" class="headerlink" title="对植物"></a>对植物</h3><p>mart要指定为plants_mart</p>
-<p>dataset指定物种数据库的名称</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">ensembl <span class="operator">=</span> useMart<span class="punctuation">(</span>biomart <span class="operator">=</span> <span class="string">&quot;plants_mart&quot;</span><span class="punctuation">,</span>host <span class="operator">=</span> <span class="string">&quot;http://plants.ensembl.org&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 列出可选择的植物</span></span><br><span class="line">listDatasets<span class="punctuation">(</span>ensembl<span class="punctuation">)</span>  </span><br><span class="line"></span><br><span class="line">ensembl <span class="operator">=</span> useMart<span class="punctuation">(</span>biomart <span class="operator">=</span> <span class="string">&quot;plants_mart&quot;</span><span class="punctuation">,</span>host <span class="operator">=</span> <span class="string">&quot;http://plants.ensembl.org&quot;</span><span class="punctuation">,</span>dataset<span class="operator">=</span><span class="string">&quot;sitalica_eg_gene&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">gene <span class="operator">&lt;-</span> read.table<span class="punctuation">(</span><span class="string">&quot;./128个基因.txt&quot;</span><span class="punctuation">)</span></span><br><span class="line">gene <span class="operator">&lt;-</span> gene<span class="operator">$</span>V1</span><br><span class="line"></span><br><span class="line">listAttributes<span class="punctuation">(</span>ensembl<span class="punctuation">)</span> <span class="operator">%&gt;%</span> View<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">gene_anno <span class="operator">&lt;-</span> getBM<span class="punctuation">(</span><span class="built_in">attributes</span><span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="string">&quot;ensembl_gene_id&quot;</span><span class="punctuation">,</span> <span class="string">&quot;gene_biotype&quot;</span><span class="punctuation">,</span></span><br><span class="line">                                 <span class="string">&quot;chromosome_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;start_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;end_position&quot;</span><span class="punctuation">,</span></span><br><span class="line">                                 <span class="string">&quot;strand&quot;</span><span class="punctuation">,</span><span class="string">&quot;description&quot;</span><span class="punctuation">,</span><span class="string">&quot;ensembl_peptide_id&quot;</span><span class="punctuation">,</span><span class="string">&quot;peptide&quot;</span><span class="punctuation">)</span><span class="punctuation">,</span> </span><br><span class="line">                    filters<span class="operator">=</span> <span class="string">&#x27;ensembl_gene_id&#x27;</span><span class="punctuation">,</span> value <span class="operator">=</span>gene<span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+    <title>获取基因长度计算FPKM_TPM</title>
+    <url>/20230107_%E8%8E%B7%E5%8F%96%E5%9F%BA%E5%9B%A0%E9%95%BF%E5%BA%A6%E8%AE%A1%E7%AE%97FPKM_TPM/</url>
+    <content><![CDATA[<span id="more"></span>
 
+<h2 id><a href="#" class="headerlink" title></a></h2><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">library<span class="punctuation">(</span>parallel<span class="punctuation">)</span>         <span class="comment">#并行计算  parApply parLapply parSaplly </span></span><br><span class="line">library<span class="punctuation">(</span>GenomicFeatures<span class="punctuation">)</span></span><br><span class="line">library<span class="punctuation">(</span>dplyr<span class="punctuation">)</span></span><br><span class="line">options<span class="punctuation">(</span>max.print <span class="operator">=</span> <span class="number">10</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
+<h2 id="使用GTF文件获取基因长度信息"><a href="#使用GTF文件获取基因长度信息" class="headerlink" title="使用GTF文件获取基因长度信息"></a>使用GTF文件获取基因长度信息</h2><p>参考: <a href="https://mp.weixin.qq.com/s/VsVDZPeJiNqwXUgj0mOVVA">https://mp.weixin.qq.com/s/VsVDZPeJiNqwXUgj0mOVVA</a></p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">cl <span class="operator">&lt;-</span> makeCluster<span class="punctuation">(</span><span class="number">0.75</span><span class="operator">*</span>detectCores<span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">)</span>  <span class="comment">#设计启用计算机3/4的核</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## 利用GenomicFeatures包导入gtf处理</span></span><br><span class="line">txdb <span class="operator">&lt;-</span> makeTxDbFromGFF<span class="punctuation">(</span><span class="string">&quot;../../post_share_data/Mus_musculus.GRCm39.108.gtf.gz&quot;</span><span class="punctuation">,</span></span><br><span class="line">                        format<span class="operator">=</span><span class="string">&quot;gtf&quot;</span><span class="punctuation">)</span> </span><br><span class="line"></span><br><span class="line"><span class="comment">## 提取基因外显子</span></span><br><span class="line">exons_gene <span class="operator">&lt;-</span> exonsBy<span class="punctuation">(</span>txdb<span class="punctuation">,</span> by <span class="operator">=</span> <span class="string">&quot;gene&quot;</span><span class="punctuation">)</span> </span><br><span class="line">head<span class="punctuation">(</span>exons_gene<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## 计算总外显子长度：用reduce去除掉重叠冗余的部分，,width统计长度，最后计算总长度</span></span><br><span class="line">exons_gene_lens <span class="operator">&lt;-</span> parLapply<span class="punctuation">(</span>cl<span class="punctuation">,</span>exons_gene<span class="punctuation">,</span><span class="keyword">function</span><span class="punctuation">(</span>x<span class="punctuation">)</span><span class="punctuation">&#123;</span><span class="built_in">sum</span><span class="punctuation">(</span>width<span class="punctuation">(</span>reduce<span class="punctuation">(</span>x<span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">&#125;</span><span class="punctuation">)</span> </span><br><span class="line">exons_gene_lens<span class="punctuation">[</span><span class="number">1</span><span class="operator">:</span><span class="number">10</span><span class="punctuation">]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">##转换为dataframe</span></span><br><span class="line">geneid_efflen <span class="operator">&lt;-</span> data.frame<span class="punctuation">(</span>geneid<span class="operator">=</span><span class="built_in">names</span><span class="punctuation">(</span>exons_gene_lens<span class="punctuation">)</span><span class="punctuation">,</span></span><br><span class="line">                            efflen<span class="operator">=</span><span class="built_in">as.numeric</span><span class="punctuation">(</span>exons_gene_lens<span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
-<p><code>listAttributes(ensembl) %&gt;% View()</code></p>
-<p>列出可以添加的信息</p>
-<p><img src="/Biomart%E5%AF%B9%E5%9F%BA%E5%9B%A0%E8%BF%9B%E8%A1%8C%E6%B3%A8%E9%87%8A/image-20220925204715975.png" alt="image-20220925204715975"></p>
-<h3 id="对动物"><a href="#对动物" class="headerlink" title="对动物"></a>对动物</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">listEnsembl<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">ensembl <span class="operator">&lt;-</span> useEnsembl<span class="punctuation">(</span>biomart <span class="operator">=</span> <span class="string">&quot;genes&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">listDatasets<span class="punctuation">(</span>ensembl<span class="punctuation">)</span></span><br><span class="line">ensembl <span class="operator">&lt;-</span> useDataset<span class="punctuation">(</span>dataset <span class="operator">=</span> <span class="string">&quot;mmusculus_gene_ensembl&quot;</span><span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">listAttributes<span class="punctuation">(</span>ensembl<span class="punctuation">)</span> <span class="operator">%&gt;%</span> View<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">martsymbol <span class="operator">&lt;-</span> getBM<span class="punctuation">(</span><span class="built_in">attributes</span><span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="string">&quot;ensembl_gene_id&quot;</span><span class="punctuation">,</span> <span class="string">&quot;external_gene_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;gene_biotype&quot;</span><span class="punctuation">,</span></span><br><span class="line">                                 <span class="string">&quot;chromosome_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;start_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;end_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;strand&quot;</span><span class="punctuation">,</span><span class="string">&quot;description&quot;</span><span class="punctuation">)</span><span class="punctuation">,</span> </span><br><span class="line">                    filters<span class="operator">=</span> <span class="string">&#x27;ensembl_gene_id&#x27;</span><span class="punctuation">,</span> value <span class="operator">=</span>diff_gene<span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+<p>一列为基因名ENSEMBL ID 一列为基因长度</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">load<span class="punctuation">(</span><span class="string">&quot;../../post_share_data/geneid_efflen_Mus_GRCm39_108.RData&quot;</span><span class="punctuation">)</span></span><br><span class="line">head<span class="punctuation">(</span>geneid_efflen<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
-]]></content>
-      <tags>
-        <tag>BioMart</tag>
-        <tag>gene annotate</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>R tip</title>
-    <url>/R-tip%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<h2 id="2022-10-09"><a href="#2022-10-09" class="headerlink" title="2022-10-09"></a>2022-10-09</h2><h3 id="解析字符串为表达式并运行"><a href="#解析字符串为表达式并运行" class="headerlink" title="解析字符串为表达式并运行"></a>解析字符串为表达式并运行</h3><p>parse把文本变成表达式 expression</p>
-<p>eval 在对表达式解析运行</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="built_in">class</span><span class="punctuation">(</span>parse<span class="punctuation">(</span>text <span class="operator">=</span> <span class="string">&quot;1:10&quot;</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; [1] &quot;expression&quot;
+<pre><code>#&gt;               geneid efflen
+#&gt; 1 ENSMUSG00000000001   3262
+#&gt; 2 ENSMUSG00000000003    902
+#&gt; 3 ENSMUSG00000000028   3506
+#&gt; 4 ENSMUSG00000000031   2625
+#&gt; 5 ENSMUSG00000000037   6397
+#&gt;  [ reached &#39;max&#39; / getOption(&quot;max.print&quot;) -- omitted 1 rows ]
 </code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">eval<span class="punctuation">(</span>parse<span class="punctuation">(</span>text <span class="operator">=</span> <span class="string">&quot;c(1:10)&quot;</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt;  [1]  1  2  3  4  5  6  7  8  9 10
-</code></pre>
-<p>比如 可以把命令藏在数据框里，然后再运行，得到运行结果</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">df <span class="operator">&lt;-</span> data.frame<span class="punctuation">(</span>a <span class="operator">=</span> <span class="string">&quot;c(1:10,100:110)&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">eval<span class="punctuation">(</span>parse<span class="punctuation">(</span>text <span class="operator">=</span> df<span class="operator">$</span>a<span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt;  [1]   1   2   3   4   5   6   7   8   9  10 100 101 102 103 104 105 106 107 108
-#&gt; [20] 109 110
-</code></pre>
-<p>ggplot画图时也可以排上用场</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">library<span class="punctuation">(</span>ggplot2<span class="punctuation">)</span></span><br><span class="line">plot_func <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>var<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  ggplot<span class="punctuation">(</span>data <span class="operator">=</span> mtcars<span class="punctuation">,</span> aes<span class="punctuation">(</span>x <span class="operator">=</span> eval<span class="punctuation">(</span>parse<span class="punctuation">(</span>text <span class="operator">=</span> var<span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">,</span></span><br><span class="line">                            y <span class="operator">=</span> eval<span class="punctuation">(</span>parse<span class="punctuation">(</span>text <span class="operator">=</span> <span class="string">&quot;wt&quot;</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span> </span><br><span class="line">    geom_point<span class="punctuation">(</span><span class="punctuation">)</span> <span class="operator">+</span> </span><br><span class="line">    labs<span class="punctuation">(</span>x <span class="operator">=</span> var<span class="punctuation">,</span> y <span class="operator">=</span> <span class="string">&quot;wt&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> </span><br><span class="line">    theme_bw<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">hexo</span><br><span class="line">plot_func<span class="punctuation">(</span>var <span class="operator">=</span> <span class="string">&quot;mpg&quot;</span><span class="punctuation">)</span> <span class="comment"># 正确运行了</span></span><br></pre></td></tr></table></figure>
-
-<img src="/R-tip%E8%AE%B0%E5%BD%95/figure-gfm/unnamed-chunk-3-1.png" width="384">
-
-<p>在建模时</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># lm建模中的使用 </span></span><br><span class="line">var <span class="operator">=</span> <span class="string">&quot;mpg&quot;</span></span><br><span class="line">lm_func <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>var<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  lm<span class="punctuation">(</span>eval<span class="punctuation">(</span>parse<span class="punctuation">(</span>text <span class="operator">=</span> paste0<span class="punctuation">(</span><span class="string">&quot;wt ~ &quot;</span><span class="punctuation">,</span> var<span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">,</span> data <span class="operator">=</span> mtcars<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line">lm_func<span class="punctuation">(</span>var <span class="operator">=</span> <span class="string">&quot;mpg&quot;</span><span class="punctuation">)</span> <span class="comment"># 正确执行了</span></span><br></pre></td></tr></table></figure>
+<h2 id="counts转FPKM"><a href="#counts转FPKM" class="headerlink" title="counts转FPKM"></a>counts转FPKM</h2><p>参考: <a href="https://mp.weixin.qq.com/s/IUV9dSbRBK1nvetixKOCRw">Counts FPKM RPKM TPM CPM 的转化 (qq.com)</a></p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">load<span class="punctuation">(</span><span class="string">&quot;../../post_share_data/counts_dat.RData&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">counts_dat_id <span class="operator">&lt;-</span> rownames<span class="punctuation">(</span>counts_dat<span class="punctuation">)</span></span><br><span class="line">geneid_efflen_geneid <span class="operator">&lt;-</span> geneid_efflen<span class="operator">$</span>geneid</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取共有id</span></span><br><span class="line">comm_id <span class="operator">&lt;-</span> intersect<span class="punctuation">(</span>counts_dat_id<span class="punctuation">,</span>geneid_efflen_geneid<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 过滤，id排序 保持id顺序一致</span></span><br><span class="line">geneid_efflen <span class="operator">&lt;-</span> geneid_efflen<span class="punctuation">[</span>geneid_efflen<span class="operator">$</span>geneid <span class="operator">%in%</span> comm_id<span class="punctuation">,</span><span class="punctuation">]</span></span><br><span class="line">comm_id <span class="operator">&lt;-</span> geneid_efflen<span class="operator">$</span>geneid</span><br><span class="line">counts_dat <span class="operator">&lt;-</span> counts_dat<span class="punctuation">[</span>comm_id<span class="punctuation">,</span><span class="punctuation">]</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># count--counts表达矩阵，efflength基因长度向量 基因和长度要对应</span></span><br><span class="line">counts2FPKM <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>count<span class="punctuation">,</span> efflength<span class="punctuation">)</span><span class="punctuation">&#123;</span>    </span><br><span class="line">  </span><br><span class="line">  library<span class="punctuation">(</span>purrr<span class="punctuation">)</span></span><br><span class="line">  </span><br><span class="line">  <span class="comment"># 函数对每一个样本做FPKM</span></span><br><span class="line">  f <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>count_one<span class="punctuation">,</span>efflength<span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="comment"># counts的每百万缩放因子 (“per million” scaling factor) 深度标准化   </span></span><br><span class="line">  PMSC_counts <span class="operator">&lt;-</span> <span class="built_in">sum</span><span class="punctuation">(</span>count_one<span class="punctuation">)</span><span class="operator">/</span><span class="number">1e6</span>   </span><br><span class="line">  <span class="comment"># 每百万reads/Fragments (Reads/Fragments Per Million) 长度标准化  </span></span><br><span class="line">  FPM <span class="operator">&lt;-</span> count_one<span class="operator">/</span>PMSC_counts         </span><br><span class="line">  FPM<span class="operator">/</span><span class="punctuation">(</span>efflength<span class="operator">/</span><span class="number">1000</span><span class="punctuation">)</span>   </span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line">  </span><br><span class="line">  <span class="comment"># 对全部样本做FPKM</span></span><br><span class="line">  FPKM_data <span class="operator">&lt;-</span> map_dfc<span class="punctuation">(</span>count<span class="punctuation">,</span>f<span class="punctuation">,</span>efflength<span class="punctuation">)</span></span><br><span class="line">  </span><br><span class="line">  <span class="built_in">return</span><span class="punctuation">(</span>FPKM_data<span class="punctuation">)</span></span><br><span class="line">  </span><br><span class="line"><span class="punctuation">&#125;</span> </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">FPKM <span class="operator">&lt;-</span> counts2FPKM<span class="punctuation">(</span>count <span class="operator">=</span> counts_dat<span class="punctuation">,</span>efflength <span class="operator">=</span> geneid_efflen<span class="operator">$</span>efflen<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
 <pre><code>#&gt; 
-#&gt; Call:
-#&gt; lm(formula = eval(parse(text = paste0(&quot;wt ~ &quot;, var))), data = mtcars)
+#&gt; Attaching package: &#39;purrr&#39;
+
+#&gt; The following object is masked from &#39;package:GenomicRanges&#39;:
 #&gt; 
-#&gt; Coefficients:
-#&gt; (Intercept)          mpg  
-#&gt;      6.0473      -0.1409
+#&gt;     reduce
+
+#&gt; The following object is masked from &#39;package:IRanges&#39;:
+#&gt; 
+#&gt;     reduce
 </code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 等同于 formula</span></span><br><span class="line">lm_func <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>var<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  lm<span class="punctuation">(</span>formula<span class="punctuation">(</span>paste0<span class="punctuation">(</span><span class="string">&quot;wt ~ &quot;</span><span class="punctuation">,</span> var<span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">,</span> data <span class="operator">=</span> mtcars<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line">lm_func<span class="punctuation">(</span>var <span class="operator">=</span> <span class="string">&quot;mpg&quot;</span><span class="punctuation">)</span> <span class="comment"># 正确执行了</span></span><br></pre></td></tr></table></figure>
+<h2 id="counts转TPM"><a href="#counts转TPM" class="headerlink" title="counts转TPM"></a>counts转TPM</h2><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">counts2TPM <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>count<span class="punctuation">,</span> efflength<span class="punctuation">)</span><span class="punctuation">&#123;</span>   </span><br><span class="line">  </span><br><span class="line">  library<span class="punctuation">(</span>purrr<span class="punctuation">)</span></span><br><span class="line">  </span><br><span class="line">  <span class="comment"># 函数对每一个样本做FPKM</span></span><br><span class="line">  f <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>count_one<span class="punctuation">,</span>efflength<span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">    </span><br><span class="line">  <span class="comment">#每千碱基reads (reads per kilobase) 长度标准化</span></span><br><span class="line">  RPK <span class="operator">&lt;-</span> count_one<span class="operator">/</span><span class="punctuation">(</span>efflength<span class="operator">/</span><span class="number">1000</span><span class="punctuation">)</span>      </span><br><span class="line">  <span class="comment">#RPK的每百万缩放因子 (“per million” scaling factor ) 深度标准化</span></span><br><span class="line">  PMSC_rpk <span class="operator">&lt;-</span> <span class="built_in">sum</span><span class="punctuation">(</span>RPK<span class="punctuation">)</span><span class="operator">/</span><span class="number">1e6</span>           </span><br><span class="line">  RPK<span class="operator">/</span>PMSC_rpk</span><br><span class="line">    </span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line">  </span><br><span class="line">  <span class="comment"># 对全部样本做FPKM</span></span><br><span class="line">  TPM_data <span class="operator">&lt;-</span> map_dfc<span class="punctuation">(</span>count<span class="punctuation">,</span>f<span class="punctuation">,</span>efflength<span class="punctuation">)</span></span><br><span class="line">  </span><br><span class="line">  <span class="built_in">return</span><span class="punctuation">(</span>TPM_data<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"><span class="punctuation">&#125;</span>    </span><br><span class="line"></span><br><span class="line">TPM <span class="operator">&lt;-</span> counts2TPM<span class="punctuation">(</span>count <span class="operator">=</span> counts_dat<span class="punctuation">,</span>efflength <span class="operator">=</span> geneid_efflen<span class="operator">$</span>efflen<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="FPKM转TPM"><a href="#FPKM转TPM" class="headerlink" title="FPKM转TPM"></a>FPKM转TPM</h2><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment">#FPKM与TPM的转化 </span></span><br><span class="line">FPKM2TPM <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>fpkm<span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  library<span class="punctuation">(</span>purrr<span class="punctuation">)</span></span><br><span class="line">  TPM_data <span class="operator">&lt;-</span> map_dfc<span class="punctuation">(</span>fpkm<span class="punctuation">,</span><span class="operator">~</span> .x<span class="operator">/</span><span class="built_in">sum</span><span class="punctuation">(</span>.x<span class="punctuation">)</span><span class="operator">*</span><span class="number">1e6</span>   <span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span> </span><br><span class="line"></span><br><span class="line">TPM2 <span class="operator">&lt;-</span> FPKM2TPM<span class="punctuation">(</span>fpkm <span class="operator">=</span> FPKM<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>生信</category>
+      </categories>
+      <tags>
+        <tag>生信 RNA-seq</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>获取基因长度计算FPKM_TPM</title>
+    <url>/20230107_%E8%8E%B7%E5%8F%96%E5%9F%BA%E5%9B%A0%E9%95%BF%E5%BA%A6%E8%AE%A1%E7%AE%97FPKM_TPM/20230107_%E8%8E%B7%E5%8F%96%E5%9F%BA%E5%9B%A0%E9%95%BF%E5%BA%A6%E8%AE%A1%E7%AE%97FPKM_TPM/</url>
+    <content><![CDATA[<span id="more"></span>
+
+<h2 id><a href="#" class="headerlink" title></a></h2><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">library<span class="punctuation">(</span>parallel<span class="punctuation">)</span>         <span class="comment">#并行计算  parApply parLapply parSaplly </span></span><br><span class="line">library<span class="punctuation">(</span>GenomicFeatures<span class="punctuation">)</span></span><br><span class="line">library<span class="punctuation">(</span>dplyr<span class="punctuation">)</span></span><br><span class="line">options<span class="punctuation">(</span>max.print <span class="operator">=</span> <span class="number">10</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="使用GTF文件获取基因长度信息"><a href="#使用GTF文件获取基因长度信息" class="headerlink" title="使用GTF文件获取基因长度信息"></a>使用GTF文件获取基因长度信息</h2><p>参考: <a href="https://mp.weixin.qq.com/s/VsVDZPeJiNqwXUgj0mOVVA">https://mp.weixin.qq.com/s/VsVDZPeJiNqwXUgj0mOVVA</a></p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">cl <span class="operator">&lt;-</span> makeCluster<span class="punctuation">(</span><span class="number">0.75</span><span class="operator">*</span>detectCores<span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">)</span>  <span class="comment">#设计启用计算机3/4的核</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## 利用GenomicFeatures包导入gtf处理</span></span><br><span class="line">txdb <span class="operator">&lt;-</span> makeTxDbFromGFF<span class="punctuation">(</span><span class="string">&quot;../../post_share_data/Mus_musculus.GRCm39.108.gtf.gz&quot;</span><span class="punctuation">,</span></span><br><span class="line">                        format<span class="operator">=</span><span class="string">&quot;gtf&quot;</span><span class="punctuation">)</span> </span><br><span class="line"></span><br><span class="line"><span class="comment">## 提取基因外显子</span></span><br><span class="line">exons_gene <span class="operator">&lt;-</span> exonsBy<span class="punctuation">(</span>txdb<span class="punctuation">,</span> by <span class="operator">=</span> <span class="string">&quot;gene&quot;</span><span class="punctuation">)</span> </span><br><span class="line">head<span class="punctuation">(</span>exons_gene<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## 计算总外显子长度：用reduce去除掉重叠冗余的部分，,width统计长度，最后计算总长度</span></span><br><span class="line">exons_gene_lens <span class="operator">&lt;-</span> parLapply<span class="punctuation">(</span>cl<span class="punctuation">,</span>exons_gene<span class="punctuation">,</span><span class="keyword">function</span><span class="punctuation">(</span>x<span class="punctuation">)</span><span class="punctuation">&#123;</span><span class="built_in">sum</span><span class="punctuation">(</span>width<span class="punctuation">(</span>reduce<span class="punctuation">(</span>x<span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">&#125;</span><span class="punctuation">)</span> </span><br><span class="line">exons_gene_lens<span class="punctuation">[</span><span class="number">1</span><span class="operator">:</span><span class="number">10</span><span class="punctuation">]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">##转换为dataframe</span></span><br><span class="line">geneid_efflen <span class="operator">&lt;-</span> data.frame<span class="punctuation">(</span>geneid<span class="operator">=</span><span class="built_in">names</span><span class="punctuation">(</span>exons_gene_lens<span class="punctuation">)</span><span class="punctuation">,</span></span><br><span class="line">                            efflen<span class="operator">=</span><span class="built_in">as.numeric</span><span class="punctuation">(</span>exons_gene_lens<span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<p>一列为基因名ENSEMBL ID 一列为基因长度</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">load<span class="punctuation">(</span><span class="string">&quot;../../post_share_data/geneid_efflen_Mus_GRCm39_108.RData&quot;</span><span class="punctuation">)</span></span><br><span class="line">head<span class="punctuation">(</span>geneid_efflen<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>#&gt;               geneid efflen
+#&gt; 1 ENSMUSG00000000001   3262
+#&gt; 2 ENSMUSG00000000003    902
+#&gt; 3 ENSMUSG00000000028   3506
+#&gt; 4 ENSMUSG00000000031   2625
+#&gt; 5 ENSMUSG00000000037   6397
+#&gt;  [ reached &#39;max&#39; / getOption(&quot;max.print&quot;) -- omitted 1 rows ]
+</code></pre>
+<h2 id="counts转FPKM"><a href="#counts转FPKM" class="headerlink" title="counts转FPKM"></a>counts转FPKM</h2><p>参考: <a href="https://mp.weixin.qq.com/s/IUV9dSbRBK1nvetixKOCRw">Counts FPKM RPKM TPM CPM 的转化 (qq.com)</a></p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">load<span class="punctuation">(</span><span class="string">&quot;../../post_share_data/counts_dat.RData&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">counts_dat_id <span class="operator">&lt;-</span> rownames<span class="punctuation">(</span>counts_dat<span class="punctuation">)</span></span><br><span class="line">geneid_efflen_geneid <span class="operator">&lt;-</span> geneid_efflen<span class="operator">$</span>geneid</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取共有id</span></span><br><span class="line">comm_id <span class="operator">&lt;-</span> intersect<span class="punctuation">(</span>counts_dat_id<span class="punctuation">,</span>geneid_efflen_geneid<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 过滤，id排序 保持id顺序一致</span></span><br><span class="line">geneid_efflen <span class="operator">&lt;-</span> geneid_efflen<span class="punctuation">[</span>geneid_efflen<span class="operator">$</span>geneid <span class="operator">%in%</span> comm_id<span class="punctuation">,</span><span class="punctuation">]</span></span><br><span class="line">comm_id <span class="operator">&lt;-</span> geneid_efflen<span class="operator">$</span>geneid</span><br><span class="line">counts_dat <span class="operator">&lt;-</span> counts_dat<span class="punctuation">[</span>comm_id<span class="punctuation">,</span><span class="punctuation">]</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># count--counts表达矩阵，efflength基因长度向量 基因和长度要对应</span></span><br><span class="line">counts2FPKM <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>count<span class="punctuation">,</span> efflength<span class="punctuation">)</span><span class="punctuation">&#123;</span>    </span><br><span class="line">  </span><br><span class="line">  library<span class="punctuation">(</span>purrr<span class="punctuation">)</span></span><br><span class="line">  </span><br><span class="line">  <span class="comment"># 函数对每一个样本做FPKM</span></span><br><span class="line">  f <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>count_one<span class="punctuation">,</span>efflength<span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="comment"># counts的每百万缩放因子 (“per million” scaling factor) 深度标准化   </span></span><br><span class="line">  PMSC_counts <span class="operator">&lt;-</span> <span class="built_in">sum</span><span class="punctuation">(</span>count_one<span class="punctuation">)</span><span class="operator">/</span><span class="number">1e6</span>   </span><br><span class="line">  <span class="comment"># 每百万reads/Fragments (Reads/Fragments Per Million) 长度标准化  </span></span><br><span class="line">  FPM <span class="operator">&lt;-</span> count_one<span class="operator">/</span>PMSC_counts         </span><br><span class="line">  FPM<span class="operator">/</span><span class="punctuation">(</span>efflength<span class="operator">/</span><span class="number">1000</span><span class="punctuation">)</span>   </span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line">  </span><br><span class="line">  <span class="comment"># 对全部样本做FPKM</span></span><br><span class="line">  FPKM_data <span class="operator">&lt;-</span> map_dfc<span class="punctuation">(</span>count<span class="punctuation">,</span>f<span class="punctuation">,</span>efflength<span class="punctuation">)</span></span><br><span class="line">  </span><br><span class="line">  <span class="built_in">return</span><span class="punctuation">(</span>FPKM_data<span class="punctuation">)</span></span><br><span class="line">  </span><br><span class="line"><span class="punctuation">&#125;</span> </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">FPKM <span class="operator">&lt;-</span> counts2FPKM<span class="punctuation">(</span>count <span class="operator">=</span> counts_dat<span class="punctuation">,</span>efflength <span class="operator">=</span> geneid_efflen<span class="operator">$</span>efflen<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
 <pre><code>#&gt; 
-#&gt; Call:
-#&gt; lm(formula = formula(paste0(&quot;wt ~ &quot;, var)), data = mtcars)
+#&gt; Attaching package: &#39;purrr&#39;
+
+#&gt; The following object is masked from &#39;package:GenomicRanges&#39;:
 #&gt; 
-#&gt; Coefficients:
-#&gt; (Intercept)          mpg  
-#&gt;      6.0473      -0.1409
-</code></pre>
-<h3 id="指定显示p值的小数点位数"><a href="#指定显示p值的小数点位数" class="headerlink" title="指定显示p值的小数点位数"></a>指定显示p值的小数点位数</h3><p>画图通过geom_text() 添加pvalu时可以用到，较少小数点数位的显示</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">library<span class="punctuation">(</span>rstatix<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+#&gt;     reduce
 
-<pre><code>#&gt; 
-#&gt; Attaching package: &#39;rstatix&#39;
-
-#&gt; The following object is masked from &#39;package:stats&#39;:
+#&gt; The following object is masked from &#39;package:IRanges&#39;:
 #&gt; 
-#&gt;     filter
+#&gt;     reduce
 </code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">p_round<span class="punctuation">(</span><span class="number">0.000000000012131415</span><span class="punctuation">,</span>digits <span class="operator">=</span> <span class="number">3</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+<h2 id="counts转TPM"><a href="#counts转TPM" class="headerlink" title="counts转TPM"></a>counts转TPM</h2><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">counts2TPM <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>count<span class="punctuation">,</span> efflength<span class="punctuation">)</span><span class="punctuation">&#123;</span>   </span><br><span class="line">  </span><br><span class="line">  library<span class="punctuation">(</span>purrr<span class="punctuation">)</span></span><br><span class="line">  </span><br><span class="line">  <span class="comment"># 函数对每一个样本做FPKM</span></span><br><span class="line">  f <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>count_one<span class="punctuation">,</span>efflength<span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">    </span><br><span class="line">  <span class="comment">#每千碱基reads (reads per kilobase) 长度标准化</span></span><br><span class="line">  RPK <span class="operator">&lt;-</span> count_one<span class="operator">/</span><span class="punctuation">(</span>efflength<span class="operator">/</span><span class="number">1000</span><span class="punctuation">)</span>      </span><br><span class="line">  <span class="comment">#RPK的每百万缩放因子 (“per million” scaling factor ) 深度标准化</span></span><br><span class="line">  PMSC_rpk <span class="operator">&lt;-</span> <span class="built_in">sum</span><span class="punctuation">(</span>RPK<span class="punctuation">)</span><span class="operator">/</span><span class="number">1e6</span>           </span><br><span class="line">  RPK<span class="operator">/</span>PMSC_rpk</span><br><span class="line">    </span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line">  </span><br><span class="line">  <span class="comment"># 对全部样本做FPKM</span></span><br><span class="line">  TPM_data <span class="operator">&lt;-</span> map_dfc<span class="punctuation">(</span>count<span class="punctuation">,</span>f<span class="punctuation">,</span>efflength<span class="punctuation">)</span></span><br><span class="line">  </span><br><span class="line">  <span class="built_in">return</span><span class="punctuation">(</span>TPM_data<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"><span class="punctuation">&#125;</span>    </span><br><span class="line"></span><br><span class="line">TPM <span class="operator">&lt;-</span> counts2TPM<span class="punctuation">(</span>count <span class="operator">=</span> counts_dat<span class="punctuation">,</span>efflength <span class="operator">=</span> geneid_efflen<span class="operator">$</span>efflen<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 
-<pre><code>#&gt; [1] 1.21e-11
-</code></pre>
-<h3 id><a href="#" class="headerlink" title></a></h3>]]></content>
-      <categories>
-        <category>R</category>
-      </categories>
-      <tags>
-        <tag>R tip</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>adv-R_22debug</title>
-    <url>/adv-R_22debu/</url>
-    <content><![CDATA[<h3 id="Locating-errors"><a href="#Locating-errors" class="headerlink" title="Locating errors"></a><strong>Locating errors</strong></h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>a<span class="punctuation">)</span> g<span class="punctuation">(</span>a<span class="punctuation">)</span></span><br><span class="line">g <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>b<span class="punctuation">)</span> h<span class="punctuation">(</span>b<span class="punctuation">)</span></span><br><span class="line">h <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="built_in">c</span><span class="punctuation">)</span> i<span class="punctuation">(</span><span class="built_in">c</span><span class="punctuation">)</span></span><br><span class="line">i <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>d<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  <span class="keyword">if</span> <span class="punctuation">(</span><span class="operator">!</span><span class="built_in">is.numeric</span><span class="punctuation">(</span>d<span class="punctuation">)</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    stop<span class="punctuation">(</span><span class="string">&quot;`d` must be numeric&quot;</span><span class="punctuation">,</span> call. <span class="operator">=</span> <span class="literal">FALSE</span><span class="punctuation">)</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line">  d <span class="operator">+</span> <span class="number">10</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line">f<span class="punctuation">(</span><span class="string">&quot;a&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error: `d` must be numeric
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 点击报错右边的 Show Trackback 定位报错位置</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 或者 用过 traceback() 函数 </span></span><br><span class="line">traceback<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; No traceback available
-</code></pre>
-<h3 id="涉及-lazy-evaluation-使用-rlang-last-trace-rlang-abort"><a href="#涉及-lazy-evaluation-使用-rlang-last-trace-rlang-abort" class="headerlink" title="涉及 lazy evaluation 使用 rlang::last_trace() rlang::abort()"></a>涉及 lazy evaluation 使用 rlang::last_trace() rlang::abort()</h3><p>Traceback ()的一个缺点是它总是线性化调用树，如果涉及大量的惰性计算，这可能会造成混淆</p>
-<p>使用 rlang: : with _ abort ()和 rlang: : last _ trace ()查看调用树。在这里，我认为这让我们更容易看到问题的根源</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># j函数调用k函数 k函数返回stop</span></span><br><span class="line">j <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> k<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">k <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> stop<span class="punctuation">(</span><span class="string">&quot;Oops!&quot;</span><span class="punctuation">,</span> call. <span class="operator">=</span> <span class="literal">FALSE</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">j<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error: Oops!
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f<span class="punctuation">(</span>j<span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error: Oops!
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">traceback<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; No traceback available
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">rlang<span class="operator">::</span>abort<span class="punctuation">(</span>f<span class="punctuation">(</span>j<span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error: Oops!
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">rlang<span class="operator">::</span>last_trace<span class="punctuation">(</span>f<span class="punctuation">(</span>j<span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error: Can&#39;t show last error because no error was recorded yet
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="number">1</span><span class="operator">+</span>a</span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error in eval(expr, envir, enclos): object &#39;a&#39; not found
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">rlang<span class="operator">::</span>last_trace<span class="punctuation">(</span><span class="number">1</span><span class="operator">+</span>a<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error: Can&#39;t show last error because no error was recorded yet
-</code></pre>
-<h3 id="Interactive-debugger"><a href="#Interactive-debugger" class="headerlink" title="Interactive debugger"></a><strong>Interactive debugger</strong></h3><p>函数报错 则在函数内部插入 browser() 运行到 browser()便出现互交的调试界面</p>
-<p>跟pycharm一样方便的调试</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">g <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>b<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  <span class="built_in">browser</span><span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">  h<span class="punctuation">(</span>b<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">f<span class="punctuation">(</span><span class="number">10</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Called from: g(a)
-#&gt; debug at &lt;text&gt;#3: h(b)
-
-#&gt; [1] 20
-</code></pre>
-<h4 id><a href="#" class="headerlink" title></a></h4><p><strong>Breakpoints</strong><br>可以通过单击行号左侧或按 Shift + F9来设置断点。断点的行为类似于浏览器() ，但它们更容易设置(单击一次而不是按9次键) ，并且不会冒险在源代码中意外包含一个浏览器()语句。断点有两个小小的缺点:</p>
+<h2 id="FPKM转TPM"><a href="#FPKM转TPM" class="headerlink" title="FPKM转TPM"></a>FPKM转TPM</h2><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment">#FPKM与TPM的转化 </span></span><br><span class="line">FPKM2TPM <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>fpkm<span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  library<span class="punctuation">(</span>purrr<span class="punctuation">)</span></span><br><span class="line">  TPM_data <span class="operator">&lt;-</span> map_dfc<span class="punctuation">(</span>fpkm<span class="punctuation">,</span><span class="operator">~</span> .x<span class="operator">/</span><span class="built_in">sum</span><span class="punctuation">(</span>.x<span class="punctuation">)</span><span class="operator">*</span><span class="number">1e6</span>   <span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span> </span><br><span class="line"></span><br><span class="line">TPM2 <span class="operator">&lt;-</span> FPKM2TPM<span class="punctuation">(</span>fpkm <span class="operator">=</span> FPKM<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>R</category>
+        <category>生信</category>
       </categories>
       <tags>
-        <tag>adv-R</tag>
+        <tag>生信 RNA-seq</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>adv-6functions</title>
-    <url>/adv-6functions/</url>
-    <content><![CDATA[<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>b<span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  </span><br><span class="line">  <span class="comment"># AAA</span></span><br><span class="line">  a <span class="operator">=</span> b</span><br><span class="line">  </span><br><span class="line">  print<span class="punctuation">(</span>a<span class="punctuation">)</span></span><br><span class="line">  </span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="environment-获取函数所在环境"><a href="#environment-获取函数所在环境" class="headerlink" title="environment 获取函数所在环境"></a>environment 获取函数所在环境</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">library<span class="punctuation">(</span>dplyr<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; 
-#&gt; Attaching package: &#39;dplyr&#39;
-
-#&gt; The following objects are masked from &#39;package:stats&#39;:
-#&gt; 
-#&gt;     filter, lag
-
-#&gt; The following objects are masked from &#39;package:base&#39;:
-#&gt; 
-#&gt;     intersect, setdiff, setequal, union
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">environment<span class="punctuation">(</span>mean<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; &lt;environment: namespace:base&gt;
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">environment<span class="punctuation">(</span>mutate<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; &lt;environment: namespace:dplyr&gt;
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">environment<span class="punctuation">(</span>f<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; &lt;environment: R_GlobalEnv&gt;
-</code></pre>
-<h3 id="attr获取函数源代码"><a href="#attr获取函数源代码" class="headerlink" title="attr获取函数源代码"></a>attr获取函数源代码</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="built_in">attr</span><span class="punctuation">(</span>f<span class="punctuation">,</span> <span class="string">&quot;srcref&quot;</span><span class="punctuation">)</span>     <span class="comment"># 包含代码注释</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; function(b)&#123;
-#&gt;   
-#&gt;   # AAA
-#&gt;   a = b
-#&gt;   
-#&gt;   print(a)
-#&gt;   
-#&gt; &#125;
-</code></pre>
-<h3 id="Primitive-函数"><a href="#Primitive-函数" class="headerlink" title="Primitive 函数"></a><strong>Primitive</strong> 函数</h3><p>sum [ 等 用c语言写的函数 formals body attr 等对其无效</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">`[`</span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; .Primitive(&quot;[&quot;)
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">formals<span class="punctuation">(</span><span class="built_in">sum</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; NULL
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">body<span class="punctuation">(</span><span class="built_in">sum</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; NULL
-</code></pre>
-<h3 id="匿名函数"><a href="#匿名函数" class="headerlink" title="匿名函数"></a>匿名函数</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">lapply<span class="punctuation">(</span>mtcars<span class="punctuation">,</span> <span class="keyword">function</span><span class="punctuation">(</span>x<span class="punctuation">)</span> <span class="built_in">length</span><span class="punctuation">(</span>unique<span class="punctuation">(</span>x<span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; $mpg
-#&gt; [1] 25
-#&gt; 
-#&gt; $cyl
-#&gt; [1] 3
-#&gt; 
-#&gt; $disp
-#&gt; [1] 27
-#&gt; 
-#&gt; $hp
-#&gt; [1] 22
-#&gt; 
-#&gt; $drat
-#&gt; [1] 22
-#&gt; 
-#&gt; $wt
-#&gt; [1] 29
-#&gt; 
-#&gt; $qsec
-#&gt; [1] 30
-#&gt; 
-#&gt; $vs
-#&gt; [1] 2
-#&gt; 
-#&gt; $am
-#&gt; [1] 2
-#&gt; 
-#&gt; $gear
-#&gt; [1] 3
-#&gt; 
-#&gt; $carb
-#&gt; [1] 6
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">Filter<span class="punctuation">(</span><span class="keyword">function</span><span class="punctuation">(</span>x<span class="punctuation">)</span> <span class="operator">!</span><span class="built_in">is.numeric</span><span class="punctuation">(</span>x<span class="punctuation">)</span><span class="punctuation">,</span> mtcars<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; data frame with 0 columns and 32 rows
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">integrate<span class="punctuation">(</span><span class="keyword">function</span><span class="punctuation">(</span>x<span class="punctuation">)</span> <span class="built_in">sin</span><span class="punctuation">(</span>x<span class="punctuation">)</span> <span class="operator">^</span> <span class="number">2</span><span class="punctuation">,</span> <span class="number">0</span><span class="punctuation">,</span> <span class="built_in">pi</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; 1.570796 with absolute error &lt; 1.7e-14
-</code></pre>
-<h3 id="do-call"><a href="#do-call" class="headerlink" title="do.call"></a>do.call</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 参数 list</span></span><br><span class="line">args <span class="operator">&lt;-</span> <span class="built_in">list</span><span class="punctuation">(</span><span class="number">1</span><span class="operator">:</span><span class="number">10</span><span class="punctuation">,</span> na.rm <span class="operator">=</span> <span class="literal">TRUE</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># do.call 用法</span></span><br><span class="line"><span class="comment"># 它有两个参数: 要调用的函数和一个包含函数参数的列表:</span></span><br><span class="line">do.call<span class="punctuation">(</span>mean<span class="punctuation">,</span> args<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; [1] 5.5
-</code></pre>
-<p>do.call 的一个有用的用法</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">tmp <span class="operator">&lt;-</span> expand.grid<span class="punctuation">(</span><span class="built_in">letters</span><span class="punctuation">[</span><span class="number">1</span><span class="operator">:</span><span class="number">2</span><span class="punctuation">]</span><span class="punctuation">,</span> <span class="number">1</span><span class="operator">:</span><span class="number">2</span><span class="punctuation">,</span> <span class="built_in">c</span><span class="punctuation">(</span><span class="string">&quot;+&quot;</span><span class="punctuation">,</span> <span class="string">&quot;-&quot;</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line">tmp</span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt;   Var1 Var2 Var3
-#&gt; 1    a    1    +
-#&gt; 2    b    1    +
-#&gt; 3    a    2    +
-#&gt; 4    b    2    +
-#&gt; 5    a    1    -
-#&gt; 6    b    1    -
-#&gt; 7    a    2    -
-#&gt; 8    b    2    -
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 相当于执行：paste(tmp[[1]],tmp[[2]],tmp[[3]],sep = &quot;_&quot;)</span></span><br><span class="line">do.call<span class="punctuation">(</span><span class="string">&quot;paste&quot;</span><span class="punctuation">,</span> <span class="built_in">c</span><span class="punctuation">(</span>tmp<span class="punctuation">,</span> sep<span class="operator">=</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span><span class="punctuation">)</span>    </span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; [1] &quot;a1+&quot; &quot;b1+&quot; &quot;a2+&quot; &quot;b2+&quot; &quot;a1-&quot; &quot;b1-&quot; &quot;a2-&quot; &quot;b2-&quot;
-</code></pre>
-<p>在函数内部没有定义名称，则 R 将向上查找</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">x <span class="operator">&lt;-</span> 2</span><br><span class="line">g03 <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  y <span class="operator">&lt;-</span> 1</span><br><span class="line">  <span class="built_in">c</span><span class="punctuation">(</span>x<span class="punctuation">,</span> y<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">g03<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; [1] 2 1
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment">#&gt; [1] 2 1</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="防止向上查找-设置为空环境-导致的问题是-什么函数都不能用-比如-加法函数"><a href="#防止向上查找-设置为空环境-导致的问题是-什么函数都不能用-比如-加法函数" class="headerlink" title="防止向上查找 设置为空环境,导致的问题是 什么函数都不能用 比如 + 加法函数"></a>防止向上查找 设置为空环境,导致的问题是 什么函数都不能用 比如 + 加法函数</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 函数内部变量受外部影响</span></span><br><span class="line">g12 <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> x <span class="operator">+</span> <span class="number">1</span></span><br><span class="line">x <span class="operator">&lt;-</span> 15</span><br><span class="line">g12<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; [1] 16
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 列出依赖的变量</span></span><br><span class="line">codetools<span class="operator">::</span>findGlobals<span class="punctuation">(</span>g12<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; [1] &quot;+&quot; &quot;x&quot;
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 函数绑定好空环境 以解决这个问题</span></span><br><span class="line">environment<span class="punctuation">(</span>g12<span class="punctuation">)</span> <span class="operator">&lt;-</span> <span class="built_in">baseenv</span><span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">g12<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Error in g12(): object &#39;x&#39; not found
-</code></pre>
-<h3 id="更改函数所处环境"><a href="#更改函数所处环境" class="headerlink" title="更改函数所处环境"></a>更改函数所处环境</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">environment<span class="punctuation">(</span>g12<span class="punctuation">)</span> <span class="operator">&lt;-</span> environment<span class="punctuation">(</span>mutate<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="…"><a href="#…" class="headerlink" title="…"></a>…</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">i01 <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>y<span class="punctuation">,</span> z<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  <span class="built_in">list</span><span class="punctuation">(</span>y <span class="operator">=</span> y<span class="punctuation">,</span> z <span class="operator">=</span> z<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line">i02 <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>x<span class="punctuation">,</span> ...<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  i01<span class="punctuation">(</span>...<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line">str<span class="punctuation">(</span>i02<span class="punctuation">(</span>x <span class="operator">=</span> <span class="number">1</span><span class="punctuation">,</span> y <span class="operator">=</span> <span class="number">2</span><span class="punctuation">,</span> z <span class="operator">=</span> <span class="number">3</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; List of 2
-#&gt;  $ y: num 2
-#&gt;  $ z: num 3
-</code></pre>
-<h3 id="函数改写为前缀形式"><a href="#函数改写为前缀形式" class="headerlink" title="函数改写为前缀形式"></a>函数改写为前缀形式</h3><pre><code>x = 10
-y = 100
-x + y
-`+`(x, y)
-
-names(df) &lt;- c(&quot;x&quot;, &quot;y&quot;, &quot;z&quot;)
-`names&lt;-`(df, c(&quot;x&quot;, &quot;y&quot;, &quot;z&quot;))
-
-for(i in 1:10) print(i)
-`for`(i, 1:10, print(i))
-
-
-lapply(list(1:3, 4:5), `+`, 100)
-</code></pre>
-]]></content>
-      <categories>
-        <category>R</category>
-      </categories>
-      <tags>
-        <tag>adv-R</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>efficient R programming</title>
-    <url>/efficient_R_programming/</url>
-    <content><![CDATA[<h2 id><a href="#" class="headerlink" title></a></h2><h2 id="书本网址："><a href="#书本网址：" class="headerlink" title="书本网址："></a>书本网址：</h2><p><a href="https://csgillespie.github.io/efficientR/programming.html#ref-Wickham2014">3 Efficient programming | Efficient R programming (csgillespie.github.io)</a></p>
-<h2 id="3-Efficient-programming"><a href="#3-Efficient-programming" class="headerlink" title="3 Efficient programming"></a>3 Efficient programming</h2><h3 id="try的使用"><a href="#try的使用" class="headerlink" title="try的使用"></a>try的使用</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">good <span class="operator">=</span> try<span class="punctuation">(</span><span class="number">1</span> <span class="operator">+</span> <span class="number">1</span><span class="punctuation">,</span> silent <span class="operator">=</span> <span class="literal">TRUE</span><span class="punctuation">)</span></span><br><span class="line">bad <span class="operator">=</span> try<span class="punctuation">(</span><span class="number">1</span> <span class="operator">+</span> <span class="string">&quot;1&quot;</span><span class="punctuation">,</span> silent <span class="operator">=</span> <span class="literal">TRUE</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">good</span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; [1] 2
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">bad</span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; [1] &quot;Error in 1 + \&quot;1\&quot; : non-numeric argument to binary operator\n&quot;
-#&gt; attr(,&quot;class&quot;)
-#&gt; [1] &quot;try-error&quot;
-#&gt; attr(,&quot;condition&quot;)
-#&gt; &lt;simpleError in 1 + &quot;1&quot;: non-numeric argument to binary operator&gt;
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="built_in">class</span><span class="punctuation">(</span>bad<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; [1] &quot;try-error&quot;
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="built_in">class</span><span class="punctuation">(</span>bad<span class="punctuation">)</span> <span class="operator">==</span> <span class="string">&quot;try-error&quot;</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; [1] TRUE
-</code></pre>
-<p>try遇到error 返回 try-error 类型，所以可以根据这个判断执行什么操作</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="punctuation">(</span><span class="built_in">class</span><span class="punctuation">(</span>bad<span class="punctuation">)</span> <span class="operator">==</span> <span class="string">&quot;try-error&quot;</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  </span><br><span class="line">  <span class="comment"># do something</span></span><br><span class="line">  </span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; NULL
-</code></pre>
-<h3 id="Invisible-返回不可见的return"><a href="#Invisible-返回不可见的return" class="headerlink" title="Invisible 返回不可见的return"></a>Invisible 返回不可见的return</h3><p>运行函数没有赋值时，会把return的内容打印的屏幕，有时候内容较多，且我们不需要赋值时，可以</p>
-<p>通过 Invisible 返回内容但不打印出来</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  s <span class="operator">&lt;-</span> 1<span class="operator">:</span><span class="number">10</span></span><br><span class="line">  <span class="built_in">return</span><span class="punctuation">(</span>s<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">f<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt;  [1]  1  2  3  4  5  6  7  8  9 10
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f2 <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">  s <span class="operator">&lt;-</span> 1<span class="operator">:</span><span class="number">10</span></span><br><span class="line">  <span class="built_in">invisible</span><span class="punctuation">(</span>s<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">f2<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f2_return <span class="operator">&lt;-</span> f2<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">f2_return</span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt;  [1]  1  2  3  4  5  6  7  8  9 10
-</code></pre>
-<h3 id="Function-closures-函数闭包"><a href="#Function-closures-函数闭包" class="headerlink" title="Function closures 函数闭包"></a>Function closures 函数闭包</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># &lt;&lt;- assigns values to the parent environment</span></span><br><span class="line">stop_watch <span class="operator">=</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  start_time <span class="operator">=</span> stop_time <span class="operator">=</span> <span class="literal">NULL</span></span><br><span class="line">  start <span class="operator">=</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> start_time <span class="operator">&lt;&lt;-</span> Sys.time<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">  stop <span class="operator">=</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    stop_time <span class="operator">&lt;&lt;-</span> Sys.time<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">    difftime<span class="punctuation">(</span>stop_time<span class="punctuation">,</span> start_time<span class="punctuation">)</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="built_in">list</span><span class="punctuation">(</span>start <span class="operator">=</span> start<span class="punctuation">,</span> stop <span class="operator">=</span> stop<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">watch <span class="operator">=</span> stop_watch<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">watch</span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; $start
-#&gt; function() start_time &lt;&lt;- Sys.time()
-#&gt; &lt;environment: 0x000001f1d739f7f8&gt;
-#&gt; 
-#&gt; $stop
-#&gt; function() &#123;
-#&gt;     stop_time &lt;&lt;- Sys.time()
-#&gt;     difftime(stop_time, start_time)
-#&gt;   &#125;
-#&gt; &lt;environment: 0x000001f1d739f7f8&gt;
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">watch<span class="operator">$</span>start<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">watch<span class="operator">$</span>stop<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Time difference of 0.0009000301 secs
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># 意思是 counter 函数最后返回的的 iplus 函数 </span></span><br><span class="line">counter <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">   i <span class="operator">&lt;-</span> 0</span><br><span class="line">   iplus <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">&#123;</span></span><br><span class="line">      i <span class="operator">&lt;&lt;-</span> i<span class="operator">+</span><span class="number">1</span></span><br><span class="line">      i </span><br><span class="line">   <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="comment"># 注意 没有（）括号 fanhui</span></span><br><span class="line">    iplus</span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 这里相当于把 iplus 函数 传递给了c1</span></span><br><span class="line">c1 <span class="operator">&lt;-</span>counter<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">c1</span><br><span class="line"><span class="comment">#&gt; function()&#123;</span></span><br><span class="line"><span class="comment">#&gt;       i &lt;&lt;- i+1</span></span><br><span class="line"><span class="comment">#&gt;       i </span></span><br><span class="line"><span class="comment">#&gt;    &#125;</span></span><br><span class="line"><span class="comment">#&gt; &lt;environment: 0x000001f1d920fa30&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># c1的环境在 counter里 i &lt;&lt;- i+1 把i放到了counter的环境里</span></span><br><span class="line">environment<span class="punctuation">(</span>c1<span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; &lt;environment: 0x000001f1d920fa30&gt;</span></span><br><span class="line"></span><br><span class="line">environment<span class="punctuation">(</span>counter<span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; &lt;environment: R_GlobalEnv&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行c1() 就是相当于 运行了 iplus 函数 </span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 1</span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 2</span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 3</span></span><br><span class="line">c1<span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line"><span class="comment">#&gt; [1] 4</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>R</category>
-      </categories>
-      <tags>
-        <tag>R note</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>glue学习</title>
-    <url>/glue/</url>
-    <content><![CDATA[<h3 id="glue-处理字符串连接”-变量or表达式-”"><a href="#glue-处理字符串连接”-变量or表达式-”" class="headerlink" title="glue 处理字符串连接”{变量or表达式}”`"></a>glue 处理字符串连接”{变量or表达式}”`</h3><p>glue处理过后的字符串可以通过 + 和其他字符串进行连接，是可以接表达式</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">library<span class="punctuation">(</span>glue<span class="punctuation">)</span></span><br><span class="line">library<span class="punctuation">(</span>dplyr<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; 
-#&gt; 载入程辑包：&#39;dplyr&#39;
-
-#&gt; The following objects are masked from &#39;package:stats&#39;:
-#&gt; 
-#&gt;     filter, lag
-
-#&gt; The following objects are masked from &#39;package:base&#39;:
-#&gt; 
-#&gt;     intersect, setdiff, setequal, union
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">me <span class="operator">=</span> <span class="string">&quot;junjie&quot;</span></span><br><span class="line">glue<span class="punctuation">(</span><span class="string">&quot;my name is &#123;me&#125;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; my name is junjie
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">glue<span class="punctuation">(</span><span class="string">&quot;AAAA&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> <span class="string">&quot;我是&#123;me&#125;&quot;</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; AAAA我是junjie
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">glue<span class="punctuation">(</span><span class="string">&quot;BB&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> <span class="string">&quot;KK&quot;</span> <span class="operator">+</span> getwd<span class="punctuation">(</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; BBKKE:/R_practice
-</code></pre>
-<h3 id="在数据框中的使用"><a href="#在数据框中的使用" class="headerlink" title="在数据框中的使用"></a>在数据框中的使用</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">mtcars <span class="operator">%&gt;%</span> glue_data<span class="punctuation">(</span><span class="string">&quot;&#123;rownames(.)&#125; has &#123;hp&#125; hp&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Mazda RX4 has 110 hp
-#&gt; Mazda RX4 Wag has 110 hp
-#&gt; Datsun 710 has 93 hp
-#&gt; Hornet 4 Drive has 110 hp
-#&gt; Hornet Sportabout has 175 hp
-#&gt; Valiant has 105 hp
-#&gt; Duster 360 has 245 hp
-#&gt; Merc 240D has 62 hp
-#&gt; Merc 230 has 95 hp
-#&gt; Merc 280 has 123 hp
-#&gt; Merc 280C has 123 hp
-#&gt; Merc 450SE has 180 hp
-#&gt; Merc 450SL has 180 hp
-#&gt; Merc 450SLC has 180 hp
-#&gt; Cadillac Fleetwood has 205 hp
-#&gt; Lincoln Continental has 215 hp
-#&gt; Chrysler Imperial has 230 hp
-#&gt; Fiat 128 has 66 hp
-#&gt; Honda Civic has 52 hp
-#&gt; Toyota Corolla has 65 hp
-#&gt; Toyota Corona has 97 hp
-#&gt; Dodge Challenger has 150 hp
-#&gt; AMC Javelin has 150 hp
-#&gt; Camaro Z28 has 245 hp
-#&gt; Pontiac Firebird has 175 hp
-#&gt; Fiat X1-9 has 66 hp
-#&gt; Porsche 914-2 has 91 hp
-#&gt; Lotus Europa has 113 hp
-#&gt; Ford Pantera L has 264 hp
-#&gt; Ferrari Dino has 175 hp
-#&gt; Maserati Bora has 335 hp
-#&gt; Volvo 142E has 109 hp
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">head<span class="punctuation">(</span>iris<span class="punctuation">)</span> <span class="operator">%&gt;%</span></span><br><span class="line">  mutate<span class="punctuation">(</span>description <span class="operator">=</span> glue<span class="punctuation">(</span><span class="string">&quot;This &#123;Species&#125; has a petal length of &#123;Petal.Length&#125;&quot;</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">%&gt;%</span> </span><br><span class="line">  pull<span class="punctuation">(</span>description<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; This setosa has a petal length of 1.4
-#&gt; This setosa has a petal length of 1.4
-#&gt; This setosa has a petal length of 1.3
-#&gt; This setosa has a petal length of 1.5
-#&gt; This setosa has a petal length of 1.4
-#&gt; This setosa has a petal length of 1.7
-</code></pre>
-<h3 id="字符串太长换行显示"><a href="#字符串太长换行显示" class="headerlink" title="字符串太长换行显示::"></a>字符串太长换行显示::</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">glue<span class="punctuation">(</span></span><br><span class="line">  <span class="string">&quot;AAAAAAAAAAAA\\</span></span><br><span class="line"><span class="string">   BBBBBBBBBBBBBB\\</span></span><br><span class="line"><span class="string">   CCCC&quot;</span></span><br><span class="line"><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<div class="cell-output cell-output-stdout">
-
-<pre><code>#&gt; AAAAAAAAAAAABBBBBBBBBBBBBBCCCC
-</code></pre>
-</div>
-
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">glue<span class="punctuation">(</span></span><br><span class="line">  <span class="string">&quot;AAAAAAAAAAAA\n\\</span></span><br><span class="line"><span class="string">BBBBBBBBBBBBBB\n\\</span></span><br><span class="line"><span class="string">  CCCC&quot;</span></span><br><span class="line"><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<div class="cell-output cell-output-stdout">
-
-<pre><code>#&gt; AAAAAAAAAAAA
-#&gt; BBBBBBBBBBBBBB
-#&gt;   CCCC
-</code></pre>
-</div>
-
-<p>:::</p>
-<h3 id="字符串向量合并"><a href="#字符串向量合并" class="headerlink" title="字符串向量合并::"></a>字符串向量合并::</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">glue_collapse<span class="punctuation">(</span>glue<span class="punctuation">(</span><span class="string">&quot;&#123;1:10&#125;&quot;</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<div class="cell-output cell-output-stdout">
-
-<pre><code>#&gt; 12345678910
-</code></pre>
-</div>
-
-<p>:::</p>
-]]></content>
-      <categories>
-        <category>R</category>
-      </categories>
-      <tags>
-        <tag>R</tag>
-        <tag>tidy</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>quarto使用笔记</title>
-    <url>/quarto%E7%AC%94%E8%AE%B0/</url>
-    <content><![CDATA[<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ul>
-<li><p>新建一个quarto project</p>
-</li>
-<li><p>会生成 一个 _quarto.yml文件</p>
-</li>
-<li><p>配置 _quarto.yml信息 指定输出路径到博客文章md所在路径 `output-dir: ..&#x2F;Blog&#x2F;source&#x2F;_posts&#x2F;`</p>
-</li>
-<li><p>然后新建qmd,写内容 render生成md文件就到 output-dir 了</p>
-</li>
-<li><p>hexo 上传博客</p>
-</li>
-</ul>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/qazplm12_3/article/details/115587390">(101条消息) 1.5w字的Rmarkdown入门教程汇总_生信宝典的博客-CSDN博客</a></p>
-<h3 id="eval-x3D-FALSE-不运行代码块代码"><a href="#eval-x3D-FALSE-不运行代码块代码" class="headerlink" title="eval&#x3D;FALSE 不运行代码块代码"></a>eval&#x3D;FALSE 不运行代码块代码</h3><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">title<span class="operator">:</span> <span class="string">&quot;使用scale_fill* 超出指定范围的值设定为NA的颜色&quot;</span></span><br><span class="line">author<span class="operator">:</span> <span class="string">&quot;junjie&quot;</span></span><br><span class="line">format<span class="operator">:</span> hugo</span><br><span class="line">editor<span class="operator">:</span> visual</span><br><span class="line">date<span class="operator">:</span> today</span><br><span class="line"></span><br><span class="line">knitr<span class="operator">:</span></span><br><span class="line">  opts_chunk<span class="operator">:</span> </span><br><span class="line">    comment<span class="operator">:</span> <span class="string">&quot;#&gt;&quot;</span></span><br><span class="line">    </span><br><span class="line"><span class="comment"># tags: [ggplot]</span></span><br><span class="line"><span class="comment"># categories: [ggplot]</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="图片设置"><a href="#图片设置" class="headerlink" title="图片设置"></a>图片设置</h3><p>@fig-airquality further explores the impact of temperature on ozone level.</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">library<span class="punctuation">(</span>ggplot2<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">ggplot<span class="punctuation">(</span>airquality<span class="punctuation">,</span> aes<span class="punctuation">(</span>Temp<span class="punctuation">,</span> Ozone<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span> </span><br><span class="line">  geom_point<span class="punctuation">(</span><span class="punctuation">)</span> <span class="operator">+</span> </span><br><span class="line">  geom_smooth<span class="punctuation">(</span>method <span class="operator">=</span> <span class="string">&quot;loess&quot;</span></span><br><span class="line"><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<figure>
-<img src="/quarto%E7%AC%94%E8%AE%B0/figure-gfm/fig-airquality-1.png" id="fig-airquality" width="768" alt="Figure 1: Temperature and ozone level.">
-<figcaption aria-hidden="true">Figure 1: Temperature and ozone level.</figcaption>
-</figure>
-]]></content>
-      <categories>
-        <category>quarto</category>
-      </categories>
-      <tags>
-        <tag>quarto</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>test</title>
-    <url>/test/</url>
-    <content><![CDATA[<p><img src="/test/image-20220925210607257.png" alt="image-20220925210607257"></p>
-<p><img src="/test/image-20220925212954196.png" alt="image-20220925212954196"></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>hexo教程</title>
-    <url>/hexo%E6%95%99%E7%A8%8B/</url>
-    <content><![CDATA[<h1 id="githubio-hexo-使用"><a href="#githubio-hexo-使用" class="headerlink" title="githubio_hexo_使用"></a>githubio_hexo_使用</h1><h3 id="去除-files后缀"><a href="#去除-files后缀" class="headerlink" title="去除_files后缀"></a>去除_files后缀</h3><p><code>rename &#39;s/_files//&#39; *_files</code></p>
-<p><code>ls *.md |while read id;do(cat $id | sed -i &#39;s/_files//&#39; $id );done</code></p>
-<p><code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</code></p>
-<h3 id="参考视频"><a href="#参考视频" class="headerlink" title="参考视频"></a>参考视频</h3><p><a href="https://www.bilibili.com/video/BV1mU4y1j72n/?p=5&spm_id_from=pageDriver&vd_source=054bcf480436b1c4a589dd66453c235a">发布博客到互联网_哔哩哔哩_bilibili</a></p>
-<h3 id="视频笔记"><a href="#视频笔记" class="headerlink" title="视频笔记"></a>视频笔记</h3><p><a href="https://www.bilibili.com/h5/note-app/view?cvid=14840804&pagefrom=comment">笔记详情 (bilibili.com)</a></p>
-<h3 id="报错解决"><a href="#报错解决" class="headerlink" title="报错解决"></a>报错解决</h3><p><a href="https://blog.csdn.net/qq_45685435/article/details/119863595">git报错:fatal: unable to auto-detect email address，我试错10多遍，我太难了_少年，又是你的博客-CSDN博客</a></p>
-<h3 id="配置及详细使用"><a href="#配置及详细使用" class="headerlink" title="配置及详细使用"></a>配置及详细使用</h3><p><a href="https://www.bilibili.com/video/BV1444y1179K/?spm_id_from=pageDriver&vd_source=054bcf480436b1c4a589dd66453c235a">使用Hexo搭建个人博客手摸手教学(6)|配置文件说明及常用命令_哔哩哔哩_bilibili</a></p>
-<p><a href="https://blog.csdn.net/qq_38140292/article/details/119076400">【hexo】基础教程-一-撰写文章_指尖听戏的博客-CSDN博客_hexo博客怎么写文章</a></p>
-<h3 id="显示图片"><a href="#显示图片" class="headerlink" title="显示图片"></a>显示图片</h3><p>参考：<br><a href="https://oldgerman.github.io/eeea93b8/">https://oldgerman.github.io/eeea93b8/</a><br>安装<br>npm install <a href="https://github.com/CodeFalling/hexo-asset-image">https://github.com/CodeFalling/hexo-asset-image</a> –save</p>
-]]></content>
-      <tags>
-        <tag>博客教程</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>连续型变量转换为相应的颜色</title>
-    <url>/%E8%BF%9E%E7%BB%AD%E5%9E%8B%E5%8F%98%E9%87%8F%E8%BD%AC%E6%8D%A2%E4%B8%BA%E7%9B%B8%E5%BA%94%E7%9A%84%E9%A2%9C%E8%89%B2/</url>
-    <content><![CDATA[<h2 id><a href="#" class="headerlink" title></a></h2><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">library<span class="punctuation">(</span>scales<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建value</span></span><br><span class="line">values <span class="operator">&lt;-</span> <span class="built_in">c</span><span class="punctuation">(</span>seq<span class="punctuation">(</span><span class="number">1</span><span class="operator">:</span><span class="number">10</span><span class="punctuation">)</span><span class="operator">/</span><span class="number">10</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#  colorRamp 返回一个返回 用于后续创建颜色</span></span><br><span class="line"></span><br><span class="line">f <span class="operator">&lt;-</span> colorRamp<span class="punctuation">(</span><span class="built_in">c</span><span class="punctuation">(</span><span class="string">&quot;white&quot;</span><span class="punctuation">,</span> <span class="string">&quot;blue&quot;</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成一个可作为rgb函数的输入的矩阵 </span></span><br><span class="line">f<span class="punctuation">(</span>values<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt;        [,1]  [,2] [,3]
-#&gt;  [1,] 229.5 229.5  255
-#&gt;  [2,] 204.0 204.0  255
-#&gt;  [3,] 178.5 178.5  255
-#&gt;  [4,] 153.0 153.0  255
-#&gt;  [5,] 127.5 127.5  255
-#&gt;  [6,] 102.0 102.0  255
-#&gt;  [7,]  76.5  76.5  255
-#&gt;  [8,]  51.0  51.0  255
-#&gt;  [9,]  25.5  25.5  255
-#&gt; [10,]   0.0   0.0  255
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># f(values)/255 缩放到0-1之间 rgb要求的范围</span></span><br><span class="line"></span><br><span class="line"><span class="punctuation">(</span>colors <span class="operator">&lt;-</span> rgb<span class="punctuation">(</span> f<span class="punctuation">(</span>values<span class="punctuation">)</span><span class="operator">/</span><span class="number">255</span> <span class="punctuation">)</span> <span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt;  [1] &quot;#E6E6FF&quot; &quot;#CCCCFF&quot; &quot;#B3B3FF&quot; &quot;#9999FF&quot; &quot;#8080FF&quot; &quot;#6666FF&quot; &quot;#4D4DFF&quot;
-#&gt;  [8] &quot;#3333FF&quot; &quot;#1919FF&quot; &quot;#0000FF&quot;
-</code></pre>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">show_col<span class="punctuation">(</span>colors<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<img src="/%E8%BF%9E%E7%BB%AD%E5%9E%8B%E5%8F%98%E9%87%8F%E8%BD%AC%E6%8D%A2%E4%B8%BA%E7%9B%B8%E5%BA%94%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-2-1.png" width="768">
-
-<h3 id="Scale-your-values-to-range-between-0-and-1"><a href="#Scale-your-values-to-range-between-0-and-1" class="headerlink" title="Scale your values to range between 0 and 1"></a>Scale your values to range between 0 and 1</h3><p><strong>scale 过程</strong></p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">value2 <span class="operator">&lt;-</span> 1<span class="operator">:</span><span class="number">20</span></span><br><span class="line">rr <span class="operator">&lt;-</span> <span class="built_in">range</span><span class="punctuation">(</span>value2<span class="punctuation">)</span></span><br><span class="line">svals <span class="operator">&lt;-</span> <span class="punctuation">(</span>value2<span class="operator">-</span>rr<span class="punctuation">[</span><span class="number">1</span><span class="punctuation">]</span><span class="punctuation">)</span><span class="operator">/</span>diff<span class="punctuation">(</span>rr<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f <span class="operator">&lt;-</span> colorRamp<span class="punctuation">(</span><span class="built_in">c</span><span class="punctuation">(</span><span class="string">&quot;yellow&quot;</span><span class="punctuation">,</span><span class="string">&quot;lightblue&quot;</span><span class="punctuation">,</span> <span class="string">&quot;blue&quot;</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line">colors <span class="operator">&lt;-</span> rgb<span class="punctuation">(</span>f<span class="punctuation">(</span>svals<span class="punctuation">)</span><span class="operator">/</span><span class="number">255</span><span class="punctuation">)</span></span><br><span class="line">show_col<span class="punctuation">(</span>colors<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<img src="/%E8%BF%9E%E7%BB%AD%E5%9E%8B%E5%8F%98%E9%87%8F%E8%BD%AC%E6%8D%A2%E4%B8%BA%E7%9B%B8%E5%BA%94%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-4-1.png" width="768">
-
-<p><strong>alpha 透明度</strong></p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">f <span class="operator">&lt;-</span> colorRamp<span class="punctuation">(</span><span class="built_in">c</span><span class="punctuation">(</span><span class="string">&quot;yellow&quot;</span><span class="punctuation">,</span><span class="string">&quot;lightblue&quot;</span><span class="punctuation">,</span> <span class="string">&quot;blue&quot;</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line">colors <span class="operator">&lt;-</span> rgb<span class="punctuation">(</span>f<span class="punctuation">(</span>svals<span class="punctuation">)</span><span class="operator">/</span><span class="number">255</span><span class="punctuation">,</span>alpha <span class="operator">=</span> <span class="number">0.3</span><span class="punctuation">)</span></span><br><span class="line">show_col<span class="punctuation">(</span>colors<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<img src="/%E8%BF%9E%E7%BB%AD%E5%9E%8B%E5%8F%98%E9%87%8F%E8%BD%AC%E6%8D%A2%E4%B8%BA%E7%9B%B8%E5%BA%94%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-5-1.png" width="768">
-
-<p><strong>image函数也可以将生成的colors颜色字符向量转化为颜色</strong></p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">image<span class="punctuation">(</span><span class="built_in">seq_along</span><span class="punctuation">(</span>svals<span class="punctuation">)</span><span class="punctuation">,</span> <span class="number">1</span><span class="punctuation">,</span> as.matrix<span class="punctuation">(</span><span class="built_in">seq_along</span><span class="punctuation">(</span>svals<span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">,</span> col<span class="operator">=</span>colors<span class="punctuation">,</span></span><br><span class="line">      axes<span class="operator">=</span><span class="literal">FALSE</span><span class="punctuation">,</span> xlab<span class="operator">=</span><span class="string">&quot;&quot;</span><span class="punctuation">,</span> ylab<span class="operator">=</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<img src="/%E8%BF%9E%E7%BB%AD%E5%9E%8B%E5%8F%98%E9%87%8F%E8%BD%AC%E6%8D%A2%E4%B8%BA%E7%9B%B8%E5%BA%94%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-6-1.png" width="768">
-]]></content>
-      <categories>
-        <category>ggplot</category>
-      </categories>
-      <tags>
-        <tag>ggplot</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>使用scale_fill* 超出指定范围的值设定为NA的颜色</title>
-    <url>/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/</url>
-    <content><![CDATA[<h3 id="scale-fill-的一些参数使用"><a href="#scale-fill-的一些参数使用" class="headerlink" title="scale_fill* 的一些参数使用"></a><strong>scale_fill* 的一些参数使用</strong></h3><p><strong>scale_fill_gradient指定颜色梯度</strong></p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">library<span class="punctuation">(</span>ggplot2<span class="punctuation">)</span></span><br><span class="line">library<span class="punctuation">(</span>reshape2<span class="punctuation">)</span></span><br><span class="line">library<span class="punctuation">(</span>scales<span class="punctuation">)</span></span><br><span class="line">a <span class="operator">=</span> rnorm<span class="punctuation">(</span><span class="number">17</span><span class="operator">*</span><span class="number">17</span><span class="punctuation">,</span> <span class="number">0.733</span><span class="punctuation">,</span><span class="number">0.21</span><span class="punctuation">)</span></span><br><span class="line">qcMat <span class="operator">=</span> matrix<span class="punctuation">(</span>a<span class="punctuation">,</span> ncol <span class="operator">=</span> <span class="number">17</span><span class="punctuation">)</span></span><br><span class="line">qcMat<span class="punctuation">[</span>qcMat<span class="operator">&gt;</span> <span class="number">1</span><span class="punctuation">]</span> <span class="operator">=</span> <span class="number">1</span></span><br><span class="line"><span class="comment"># qcMat contains values between 0 and 1 and some NAs</span></span><br><span class="line"></span><br><span class="line">m <span class="operator">=</span> reshape2<span class="operator">::</span>melt<span class="punctuation">(</span>t<span class="punctuation">(</span>qcMat<span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line">m<span class="operator">$</span>Var2 <span class="operator">&lt;-</span> with<span class="punctuation">(</span>m<span class="punctuation">,</span>factor<span class="punctuation">(</span>Var2<span class="punctuation">,</span> levels <span class="operator">=</span> rev<span class="punctuation">(</span>sort<span class="punctuation">(</span>unique<span class="punctuation">(</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">ggplot<span class="punctuation">(</span>m<span class="punctuation">,</span> aes<span class="punctuation">(</span>as.factor<span class="punctuation">(</span>Var1<span class="punctuation">)</span><span class="punctuation">,</span> Var2<span class="punctuation">,</span> group<span class="operator">=</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_tile<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> value<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_text<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> m<span class="operator">$</span>value<span class="punctuation">,</span> label <span class="operator">=</span> <span class="built_in">round</span><span class="punctuation">(</span>m<span class="operator">$</span>value<span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  scale_fill_gradient<span class="punctuation">(</span>low <span class="operator">=</span> <span class="string">&quot;red&quot;</span><span class="punctuation">,</span> high <span class="operator">=</span> <span class="string">&quot;green&quot;</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  xlab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> ylab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Warning: Ignoring unknown aesthetics: fill
-
-#&gt; Warning: Use of `m$value` is discouraged. Use `value` instead.
-#&gt; Use of `m$value` is discouraged. Use `value` instead.
-</code></pre>
-<img src="/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-1-1.png" width="768">
-
-<p><strong>limits参数 设定映射范围，超范围默认为NA的颜色 灰色</strong></p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># scale_fill_gradient 指定颜色时 设定映射范围，超范围默认为NA的颜色 灰色 </span></span><br><span class="line">ggplot<span class="punctuation">(</span>m<span class="punctuation">,</span> aes<span class="punctuation">(</span>as.factor<span class="punctuation">(</span>Var1<span class="punctuation">)</span><span class="punctuation">,</span> Var2<span class="punctuation">,</span> group<span class="operator">=</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_tile<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> value<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_text<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> m<span class="operator">$</span>value<span class="punctuation">,</span> label <span class="operator">=</span> <span class="built_in">round</span><span class="punctuation">(</span>m<span class="operator">$</span>value<span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  <span class="comment"># scale_fill_gradient(low = &quot;red&quot;, high = &quot;green&quot;) +</span></span><br><span class="line">  </span><br><span class="line">  scale_fill_gradient<span class="punctuation">(</span>low <span class="operator">=</span> <span class="string">&quot;red&quot;</span><span class="punctuation">,</span> high <span class="operator">=</span> <span class="string">&quot;green&quot;</span><span class="punctuation">,</span> limits<span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="number">0.6</span><span class="punctuation">,</span> <span class="number">1</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="operator">+</span></span><br><span class="line">  </span><br><span class="line">  xlab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> ylab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Warning: Ignoring unknown aesthetics: fill
-
-#&gt; Warning: Use of `m$value` is discouraged. Use `value` instead.
-#&gt; Use of `m$value` is discouraged. Use `value` instead.
-</code></pre>
-<img src="/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-2-1.png" width="768">
-
-<p><strong>na.value参数指定NA的颜色</strong></p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># scale_fill_gradient 指定颜色时 设定映射范围，超范围默认为NA的颜色 灰色 </span></span><br><span class="line"><span class="comment"># 指定NA的颜色为蓝色</span></span><br><span class="line">ggplot<span class="punctuation">(</span>m<span class="punctuation">,</span> aes<span class="punctuation">(</span>as.factor<span class="punctuation">(</span>Var1<span class="punctuation">)</span><span class="punctuation">,</span> Var2<span class="punctuation">,</span> group<span class="operator">=</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_tile<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> value<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_text<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> m<span class="operator">$</span>value<span class="punctuation">,</span> label <span class="operator">=</span> <span class="built_in">round</span><span class="punctuation">(</span>m<span class="operator">$</span>value<span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  <span class="comment"># scale_fill_gradient(low = &quot;red&quot;, high = &quot;green&quot;) +</span></span><br><span class="line">  scale_fill_gradient<span class="punctuation">(</span>low <span class="operator">=</span> <span class="string">&quot;red&quot;</span><span class="punctuation">,</span> high <span class="operator">=</span> <span class="string">&quot;green&quot;</span><span class="punctuation">,</span> limits<span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="number">0.6</span><span class="punctuation">,</span> <span class="number">1</span><span class="punctuation">)</span><span class="punctuation">,</span>na.value <span class="operator">=</span> <span class="string">&quot;blue&quot;</span><span class="punctuation">)</span><span class="operator">+</span></span><br><span class="line">  </span><br><span class="line">  xlab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> ylab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Warning: Ignoring unknown aesthetics: fill
-
-#&gt; Warning: Use of `m$value` is discouraged. Use `value` instead.
-#&gt; Use of `m$value` is discouraged. Use `value` instead.
-</code></pre>
-<img src="/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-3-1.png" width="768">
-
-<p><strong>oob&#x3D;squish 把超出范围的value 压缩到 指定范围的min or max</strong></p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># oob=squish 把超出范围的value  压缩到 指定范围的min or max </span></span><br><span class="line">ggplot<span class="punctuation">(</span>m<span class="punctuation">,</span> aes<span class="punctuation">(</span>as.factor<span class="punctuation">(</span>Var1<span class="punctuation">)</span><span class="punctuation">,</span> Var2<span class="punctuation">,</span> group<span class="operator">=</span>Var2<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_tile<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> value<span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  geom_text<span class="punctuation">(</span>aes<span class="punctuation">(</span>fill <span class="operator">=</span> m<span class="operator">$</span>value<span class="punctuation">,</span> label <span class="operator">=</span> <span class="built_in">round</span><span class="punctuation">(</span>m<span class="operator">$</span>value<span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">  <span class="comment"># scale_fill_gradient(low = &quot;red&quot;, high = &quot;green&quot;) +</span></span><br><span class="line">  </span><br><span class="line">  scale_fill_gradient<span class="punctuation">(</span>low <span class="operator">=</span> <span class="string">&quot;red&quot;</span><span class="punctuation">,</span> high <span class="operator">=</span> <span class="string">&quot;green&quot;</span><span class="punctuation">,</span> limits<span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="number">0.6</span><span class="punctuation">,</span> <span class="number">1</span><span class="punctuation">)</span><span class="punctuation">,</span> oob<span class="operator">=</span>squish<span class="punctuation">)</span><span class="operator">+</span></span><br><span class="line">  </span><br><span class="line">  xlab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span> <span class="operator">+</span> ylab<span class="punctuation">(</span><span class="string">&quot;&quot;</span><span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<pre><code>#&gt; Warning: Ignoring unknown aesthetics: fill
-
-#&gt; Warning: Use of `m$value` is discouraged. Use `value` instead.
-#&gt; Use of `m$value` is discouraged. Use `value` instead.
-</code></pre>
-<img src="/%E6%98%A0%E5%B0%84%E9%A2%9C%E8%89%B2%E6%97%B6%E8%B6%85%E5%87%BA%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E7%9A%84%E5%80%BC%E8%AE%BE%E5%AE%9A%E4%B8%BANA%E7%9A%84%E9%A2%9C%E8%89%B2/figure-gfm/unnamed-chunk-4-1.png" width="768">
-]]></content>
-      <categories>
-        <category>ggplot</category>
-      </categories>
-      <tags>
-        <tag>ggplot</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title></title>
-    <url>/%E4%B8%80%E4%B8%AAR%E9%A1%B9%E7%9B%AE%E6%B5%81%E7%A8%8B%E7%A4%BA%E4%BE%8B/</url>
-    <content><![CDATA[]]></content>
   </entry>
 </search>
