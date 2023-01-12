@@ -58,6 +58,31 @@
       </tags>
   </entry>
   <entry>
+    <title>20230111_获取基因注释信息</title>
+    <url>/RNA-seq/20230111_%E8%8E%B7%E5%8F%96%E5%9F%BA%E5%9B%A0%E6%B3%A8%E9%87%8A%E4%BF%A1%E6%81%AF/20230111_%E8%8E%B7%E5%8F%96%E5%9F%BA%E5%9B%A0%E6%B3%A8%E9%87%8A%E4%BF%A1%E6%81%AF/</url>
+    <content><![CDATA[<p><strong>要点：</strong></p>
+<ul>
+<li><p>rtracklayer包读取GTF</p>
+</li>
+<li><p>biomaRt</p>
+</li>
+</ul>
+<span id="more"></span>
+
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">library<span class="punctuation">(</span>rtracklayer<span class="punctuation">)</span></span><br><span class="line">library<span class="punctuation">(</span>biomaRt<span class="punctuation">)</span></span><br><span class="line">library<span class="punctuation">(</span>tidyverse<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="使用rtracklayer包通过GTF文件获取基因注释信息"><a href="#使用rtracklayer包通过GTF文件获取基因注释信息" class="headerlink" title="使用rtracklayer包通过GTF文件获取基因注释信息"></a>使用rtracklayer包通过GTF文件获取基因注释信息</h2><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">gtf <span class="operator">=</span> import<span class="punctuation">(</span><span class="string">&quot;../../../../post_share_data/Mus_musculus.GRCm39.108.test.gtf.gz&quot;</span><span class="punctuation">,</span>format <span class="operator">=</span> <span class="string">&quot;GTF&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">gtf_df <span class="operator">&lt;-</span> as.data.frame<span class="punctuation">(</span>gtf<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 只选择基因的行</span></span><br><span class="line">gtf_df_gene <span class="operator">&lt;-</span> gtf_df <span class="operator">%&gt;%</span> filter<span class="punctuation">(</span>type <span class="operator">==</span> <span class="string">&quot;gene&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取想要的注释信息</span></span><br><span class="line">gene_annotate <span class="operator">&lt;-</span> gtf_df_gene<span class="punctuation">[</span><span class="punctuation">,</span><span class="built_in">c</span><span class="punctuation">(</span><span class="string">&quot;seqnames&quot;</span><span class="punctuation">,</span><span class="string">&quot;start&quot;</span><span class="punctuation">,</span><span class="string">&quot;end&quot;</span><span class="punctuation">,</span><span class="string">&quot;strand&quot;</span><span class="punctuation">,</span><span class="string">&quot;gene_id&quot;</span><span class="punctuation">,</span><span class="string">&quot;gene_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;gene_biotype&quot;</span><span class="punctuation">)</span><span class="punctuation">]</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">gene_annotate<span class="punctuation">[</span><span class="number">1</span><span class="operator">:</span><span class="number">3</span><span class="punctuation">,</span><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="使用biomaRt包获取基因注释信息"><a href="#使用biomaRt包获取基因注释信息" class="headerlink" title="使用biomaRt包获取基因注释信息"></a>使用biomaRt包获取基因注释信息</h2><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">ensembl <span class="operator">&lt;-</span> useEnsembl<span class="punctuation">(</span>biomart <span class="operator">=</span> <span class="string">&quot;genes&quot;</span><span class="punctuation">)</span></span><br><span class="line">Datasets <span class="operator">&lt;-</span> listDatasets<span class="punctuation">(</span>ensembl<span class="punctuation">)</span></span><br><span class="line">ensembl <span class="operator">&lt;-</span> useDataset<span class="punctuation">(</span>dataset <span class="operator">=</span> <span class="string">&quot;mmusculus_gene_ensembl&quot;</span><span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">ensembl_id <span class="operator">&lt;-</span> gene_annotate<span class="operator">$</span>gene_id</span><br><span class="line"></span><br><span class="line"><span class="built_in">length</span><span class="punctuation">(</span>ensembl_id<span class="punctuation">)</span></span><br><span class="line"><span class="comment"># listAttributes(ensembl) %&gt;% View()</span></span><br><span class="line">gene_annotate2 <span class="operator">&lt;-</span> getBM<span class="punctuation">(</span><span class="built_in">attributes</span><span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span> <span class="string">&quot;chromosome_name&quot;</span><span class="punctuation">,</span><span class="string">&#x27;ensembl_gene_id&#x27;</span><span class="punctuation">,</span> <span class="string">&quot;external_gene_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;gene_biotype&quot;</span><span class="punctuation">,</span><span class="string">&quot;start_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;end_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;description&quot;</span><span class="punctuation">)</span><span class="punctuation">,</span> </span><br><span class="line">                    filters<span class="operator">=</span> <span class="string">&#x27;ensembl_gene_id&#x27;</span><span class="punctuation">,</span> value <span class="operator">=</span>ensembl_id<span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>RNA-seq</category>
+      </categories>
+      <tags>
+        <tag>RNA-seq</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>20230112_设置文本上下标及颜色</title>
     <url>/ggplot2/20230112_%E8%AE%BE%E7%BD%AE%E6%96%87%E6%9C%AC%E4%B8%8A%E4%B8%8B%E6%A0%87%E5%8F%8A%E9%A2%9C%E8%89%B2/20230112_%E8%AE%BE%E7%BD%AE%E6%96%87%E6%9C%AC%E4%B8%8A%E4%B8%8B%E6%A0%87%E5%8F%8A%E9%A2%9C%E8%89%B2/</url>
     <content><![CDATA[<h2 id><a href="#" class="headerlink" title></a></h2><p><strong>要点：</strong></p>
@@ -115,31 +140,6 @@
       </categories>
       <tags>
         <tag>ggplot2</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>20230111_获取基因注释信息</title>
-    <url>/RNA-seq/20230111_%E8%8E%B7%E5%8F%96%E5%9F%BA%E5%9B%A0%E6%B3%A8%E9%87%8A%E4%BF%A1%E6%81%AF/20230111_%E8%8E%B7%E5%8F%96%E5%9F%BA%E5%9B%A0%E6%B3%A8%E9%87%8A%E4%BF%A1%E6%81%AF/</url>
-    <content><![CDATA[<p><strong>要点：</strong></p>
-<ul>
-<li><p>rtracklayer包读取GTF</p>
-</li>
-<li><p>biomaRt</p>
-</li>
-</ul>
-<span id="more"></span>
-
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">library<span class="punctuation">(</span>rtracklayer<span class="punctuation">)</span></span><br><span class="line">library<span class="punctuation">(</span>biomaRt<span class="punctuation">)</span></span><br><span class="line">library<span class="punctuation">(</span>tidyverse<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="使用rtracklayer包通过GTF文件获取基因注释信息"><a href="#使用rtracklayer包通过GTF文件获取基因注释信息" class="headerlink" title="使用rtracklayer包通过GTF文件获取基因注释信息"></a>使用rtracklayer包通过GTF文件获取基因注释信息</h2><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">gtf <span class="operator">=</span> import<span class="punctuation">(</span><span class="string">&quot;../../../../post_share_data/Mus_musculus.GRCm39.108.test.gtf.gz&quot;</span><span class="punctuation">,</span>format <span class="operator">=</span> <span class="string">&quot;GTF&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">gtf_df <span class="operator">&lt;-</span> as.data.frame<span class="punctuation">(</span>gtf<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 只选择基因的行</span></span><br><span class="line">gtf_df_gene <span class="operator">&lt;-</span> gtf_df <span class="operator">%&gt;%</span> filter<span class="punctuation">(</span>type <span class="operator">==</span> <span class="string">&quot;gene&quot;</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取想要的注释信息</span></span><br><span class="line">gene_annotate <span class="operator">&lt;-</span> gtf_df_gene<span class="punctuation">[</span><span class="punctuation">,</span><span class="built_in">c</span><span class="punctuation">(</span><span class="string">&quot;seqnames&quot;</span><span class="punctuation">,</span><span class="string">&quot;start&quot;</span><span class="punctuation">,</span><span class="string">&quot;end&quot;</span><span class="punctuation">,</span><span class="string">&quot;strand&quot;</span><span class="punctuation">,</span><span class="string">&quot;gene_id&quot;</span><span class="punctuation">,</span><span class="string">&quot;gene_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;gene_biotype&quot;</span><span class="punctuation">)</span><span class="punctuation">]</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">gene_annotate<span class="punctuation">[</span><span class="number">1</span><span class="operator">:</span><span class="number">3</span><span class="punctuation">,</span><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="使用biomaRt包获取基因注释信息"><a href="#使用biomaRt包获取基因注释信息" class="headerlink" title="使用biomaRt包获取基因注释信息"></a>使用biomaRt包获取基因注释信息</h2><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">ensembl <span class="operator">&lt;-</span> useEnsembl<span class="punctuation">(</span>biomart <span class="operator">=</span> <span class="string">&quot;genes&quot;</span><span class="punctuation">)</span></span><br><span class="line">Datasets <span class="operator">&lt;-</span> listDatasets<span class="punctuation">(</span>ensembl<span class="punctuation">)</span></span><br><span class="line">ensembl <span class="operator">&lt;-</span> useDataset<span class="punctuation">(</span>dataset <span class="operator">=</span> <span class="string">&quot;mmusculus_gene_ensembl&quot;</span><span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">ensembl_id <span class="operator">&lt;-</span> gene_annotate<span class="operator">$</span>gene_id</span><br><span class="line"></span><br><span class="line"><span class="built_in">length</span><span class="punctuation">(</span>ensembl_id<span class="punctuation">)</span></span><br><span class="line"><span class="comment"># listAttributes(ensembl) %&gt;% View()</span></span><br><span class="line">gene_annotate2 <span class="operator">&lt;-</span> getBM<span class="punctuation">(</span><span class="built_in">attributes</span><span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span> <span class="string">&quot;chromosome_name&quot;</span><span class="punctuation">,</span><span class="string">&#x27;ensembl_gene_id&#x27;</span><span class="punctuation">,</span> <span class="string">&quot;external_gene_name&quot;</span><span class="punctuation">,</span><span class="string">&quot;gene_biotype&quot;</span><span class="punctuation">,</span><span class="string">&quot;start_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;end_position&quot;</span><span class="punctuation">,</span><span class="string">&quot;description&quot;</span><span class="punctuation">)</span><span class="punctuation">,</span> </span><br><span class="line">                    filters<span class="operator">=</span> <span class="string">&#x27;ensembl_gene_id&#x27;</span><span class="punctuation">,</span> value <span class="operator">=</span>ensembl_id<span class="punctuation">,</span> mart <span class="operator">=</span> ensembl<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>RNA-seq</category>
-      </categories>
-      <tags>
-        <tag>RNA-seq</tag>
       </tags>
   </entry>
 </search>
